@@ -1,0 +1,47 @@
+# IQMaster Platform v1 — İlerleme Panosu
+
+**Branch:** `cursor/iqmaster-platform-v1-472f`  
+**Orkestra:** ana ajan  
+**Son güncelleme:** 2026-08-08 12:10 UTC
+
+## Genel ilerleme
+
+| Metrik | Değer |
+|--------|-------|
+| **Toplam** | **15%** |
+| Faz | v1 paralel uygulama |
+| Durum | 5 ajan çalışıyor |
+
+```
+[███░░░░░░░░░░░░░░░░░] 15%
+```
+
+## İş akışları
+
+| ID | İş | Ajan ID | Dosya sahipliği | % | Durum |
+|----|-----|---------|-----------------|---|--------|
+| A | Tasarımı referansa yaklaştır | `bc-3748bdb0…` | styles, Header/Footer, Home/About/FAQ | 5% | running |
+| B | Erken bitirme + görsel-only motor | `bc-b2cf550a…` | session/iq, Test*, questions.ts | 5% | running |
+| C | Yaş grupları + çocuk bankaları | `bc-42f69d55…` | test-catalog, kids/teens banks, AgeSelect | 5% | running |
+| D | B2B paket/kredi iskeleti | `bc-2f3779d6…` | packages, billing, OrgDashboard | 5% | running |
+| E | PDF + sosyal paylaşım | `bc-c74bb61b…` | report/*, ShareButtons, ReportActions | 5% | running |
+| F | Entegrasyon + build + push | orchestrator | App.tsx routing, çakışma çözümü | 10% | waiting_on_agents |
+
+## v1 kabul kriterleri
+
+- [ ] Tasarım referansa daha yakın
+- [ ] İstediğin soruda bitir + güven notu
+- [ ] Sadece görsel sorular
+- [ ] Çocuk / yaş grupları
+- [ ] Paketler: Koç, Öğretmen, Aile, Şirket, İK
+- [ ] PDF rapor
+- [ ] Sosyal paylaşım
+- [ ] Build yeşil
+
+## Nasıl bakılır?
+
+Bu dosya: `docs/PROGRESS.md` — her ajan kendi satırını günceller; orkestra toplam % hesaplar.
+
+## Günlük notlar
+
+- 12:08 — 5 paralel ajan başlatıldı (A–E). Orkestra entegrasyonu ajanlar bitince.
