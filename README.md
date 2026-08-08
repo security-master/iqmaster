@@ -62,11 +62,11 @@ Scores are entertainment/education estimates, not clinical diagnoses.
 
 ## Live preview
 
-- Site: https://iqmaster-preview.abalone-shelf.workers.dev
-- Progress: https://iqmaster-preview.abalone-shelf.workers.dev/progress
+- Site: https://iqmaster-preview.canary-territory.workers.dev
+- Progress: https://iqmaster-preview.canary-territory.workers.dev/progress
 - Local progress: http://127.0.0.1:5173/progress
-- Claim temporary Cloudflare account to keep the URL:  
-  https://dash.cloudflare.com/claim-preview?claimToken=y8MoI_SqJMFqioMa7rxWL5ivdbOhtFYPdH5PQx_2-YQ
+- Claim temporary Cloudflare account to keep the URL (expires ~60 min after deploy):  
+  https://dash.cloudflare.com/claim-preview?claimToken=jQaBFYavgo47RmefuneeSVQ5vUSqlkK8NS_pQTimEOw
 
 ```bash
 npm run build
