@@ -1,4 +1,4 @@
-import { ordinal } from '../iq'
+import { ordinal, type ScoreResult } from '../iq'
 
 export interface ReportDetails {
   name: string
@@ -17,13 +17,19 @@ export interface ReportDetails {
   track?: string
   completionMode?: string
   portableCode?: string
+  countryComparison?: ScoreResult['countryComparison']
+  difficultyBreakdown?: ScoreResult['difficultyBreakdown']
+  personalizedInsights?: ScoreResult['personalizedInsights']
+  itemAnalysis?: ScoreResult['itemAnalysis']
+  age?: number
+  countryCode?: string
 }
 
 export interface ReportFileOptions {
   filename?: string
 }
 
-const REPORT_TITLE = 'IQMaster Evaluation Report'
+const REPORT_TITLE = 'IQMaster Personalized Evaluation Report'
 
 function escapeHtml(value: string): string {
   return value
@@ -67,6 +73,77 @@ export function buildReportHtml(report: ReportDetails): string {
   const safeTestId = escapeHtml(report.testId)
   const safeDate = escapeHtml(formatDate(generatedAt))
   const safeTitle = escapeHtml(`${REPORT_TITLE} - ${report.name}`)
+  const country = report.countryComparison
+  const maxBar = Math.max(155, report.iq, country?.nationalAverage ?? 100)
+
+  const difficultyHtml = report.difficultyBreakdown?.length
+    ? `<section class="card">
+        <div class="label">Difficulty performance</div>
+        <div class="grid3">
+          ${report.difficultyBreakdown
+            .map(
+              (d) => `<div class="mini">
+              <strong>${escapeHtml(d.label)}</strong>
+              <p>${d.correct}/${d.answered} correct · ${d.accuracy}%</p>
+              <div class="meter"><span style="width:${d.accuracy}%"></span></div>
+            </div>`,
+            )
+            .join('')}
+        </div>
+      </section>`
+    : ''
+
+  const insightsHtml = report.personalizedInsights?.length
+    ? `<section class="card">
+        <div class="label">Personalized evaluation</div>
+        ${report.personalizedInsights
+          .map(
+            (i) => `<div class="insight">
+            <h3>${escapeHtml(i.title)}</h3>
+            <p>${escapeHtml(i.text)}</p>
+          </div>`,
+          )
+          .join('')}
+      </section>`
+    : ''
+
+  const itemsHtml = report.itemAnalysis?.length
+    ? `<section class="card">
+        <div class="label">Item-by-item review</div>
+        <div class="items">
+          ${report.itemAnalysis
+            .map((item) => {
+              const cls =
+                item.status === 'correct' ? 'ok' : item.status === 'incorrect' ? 'bad' : 'skip'
+              const mark = item.status === 'correct' ? '✓' : item.status === 'incorrect' ? '✗' : '–'
+              return `<span class="chip ${cls}" title="Item ${item.index + 1} · D${item.difficulty}">${item.index + 1}${mark}</span>`
+            })
+            .join('')}
+        </div>
+        <p class="legend">✓ correct · ✗ incorrect · – skipped · D1–D3 difficulty</p>
+      </section>`
+    : ''
+
+  const countryHtml = country
+    ? `<section class="card">
+        <div class="label">National IQ context · ${escapeHtml(country.countryName)}</div>
+        <p class="lede-sm">${escapeHtml(country.label)} (Δ ${country.delta >= 0 ? '+' : ''}${country.delta})</p>
+        <div class="compare">
+          <div>
+            <span>Your IQ ${report.iq}</span>
+            <div class="meter gold"><span style="width:${(report.iq / maxBar) * 100}%"></span></div>
+          </div>
+          <div>
+            <span>${escapeHtml(country.countryName)} avg ${country.nationalAverage}</span>
+            <div class="meter"><span style="width:${(country.nationalAverage / maxBar) * 100}%"></span></div>
+          </div>
+          <div>
+            <span>Global mean 100</span>
+            <div class="meter"><span style="width:${(100 / maxBar) * 100}%"></span></div>
+          </div>
+        </div>
+      </section>`
+    : ''
 
   return `<!doctype html>
 <html lang="en">
@@ -75,286 +152,134 @@ export function buildReportHtml(report: ReportDetails): string {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${safeTitle}</title>
   <style>
-    :root {
-      color: #10141c;
-      background: #f4f7fa;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    :root { color:#12151c; font-family:"Figtree", ui-sans-serif, system-ui, sans-serif; }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:32px 18px; background:linear-gradient(180deg,#f3f6fa,#eef2f6); }
+    .page { width:min(100%,880px); margin:0 auto 28px; padding:40px; border:1px solid rgba(18,21,28,.1); border-radius:22px; background:#fff; box-shadow:0 22px 60px rgba(18,21,28,.1); }
+    .brand { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:28px; }
+    .brand-name { font-family:Georgia,"Times New Roman",serif; font-size:30px; font-weight:700; }
+    .badge { padding:8px 14px; border-radius:999px; background:#f0e6d4; color:#7a5c2e; font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    h1 { margin:0; font-family:Georgia,"Times New Roman",serif; font-size:clamp(28px,6vw,46px); letter-spacing:-.04em; line-height:1.05; }
+    h2,h3 { margin:0; }
+    p { margin:0; color:#3a4250; line-height:1.65; }
+    .lede { margin-top:14px; max-width:640px; font-size:17px; }
+    .lede-sm { margin:10px 0 16px; }
+    .score-panel { display:grid; grid-template-columns:0.9fr 1.1fr; gap:18px; margin:28px 0; }
+    .card, .score-card, .detail-card { border:1px solid rgba(18,21,28,.1); border-radius:18px; padding:22px; background:#f8fafc; margin-bottom:16px; }
+    .score { margin:8px 0; color:#1a3f6d; font-size:84px; font-weight:900; letter-spacing:-.08em; line-height:.9; }
+    .band { font-size:24px; font-weight:800; letter-spacing:-.03em; color:#12151c; }
+    .label { color:#6a7280; font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin-bottom:12px; }
+    .detail-list { display:grid; gap:14px; margin-top:12px; }
+    .detail-value { margin-top:2px; color:#12151c; font-size:18px; font-weight:800; }
+    .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .mini strong { display:block; margin-bottom:4px; }
+    .meter { height:8px; border-radius:999px; background:rgba(18,21,28,.08); overflow:hidden; margin-top:8px; }
+    .meter span { display:block; height:100%; background:#1a3f6d; }
+    .meter.gold span { background:#c9a76a; }
+    .compare { display:grid; gap:14px; }
+    .insight { padding:12px 0; border-top:1px solid rgba(18,21,28,.08); }
+    .insight:first-of-type { border-top:0; }
+    .insight h3 { font-size:16px; margin-bottom:4px; }
+    .items { display:flex; flex-wrap:wrap; gap:6px; }
+    .chip { width:42px; height:32px; border-radius:8px; display:grid; place-items:center; font-size:12px; font-weight:800; }
+    .chip.ok { background:#dcfce7; color:#166534; }
+    .chip.bad { background:#fee2e2; color:#991b1b; }
+    .chip.skip { background:#e5e7eb; color:#4b5563; }
+    .legend { margin-top:10px; font-size:12px; color:#6a7280; }
+    .note { margin-top:18px; padding:16px 18px; border-left:4px solid #c9a76a; border-radius:12px; background:#faf6ee; }
+    .footer { display:flex; justify-content:space-between; gap:12px; margin-top:28px; padding-top:16px; border-top:1px solid rgba(18,21,28,.1); color:#6a7280; font-size:12px; }
+    .certificate-page { min-height:980px; display:grid; place-items:center; background:
+      radial-gradient(circle at 20% 20%, rgba(201,167,106,.18), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(26,63,109,.12), transparent 42%),
+      #fbf8f2; }
+    .certificate-shell { width:min(100%,720px); padding:48px 40px; border:1px solid rgba(201,167,106,.55); background:#fffefb; box-shadow:0 28px 70px rgba(18,21,28,.12); position:relative; text-align:center; }
+    .certificate-shell:before { content:""; position:absolute; inset:14px; border:1px solid rgba(26,63,109,.2); pointer-events:none; }
+    .certificate-shell .eyebrow { letter-spacing:.18em; text-transform:uppercase; color:#a18455; font-size:12px; font-weight:800; }
+    .certificate-shell h1 { font-family:Georgia,"Times New Roman",serif; font-size:40px; margin:12px 0 8px; }
+    .certificate-shell .score { color:#1a3f6d; font-size:72px; margin:18px 0 8px; }
+    .seal { width:84px; height:84px; margin:18px auto 0; border-radius:50%; border:2px solid #c9a76a; display:grid; place-items:center; color:#1a3f6d; font-weight:900; letter-spacing:.08em; font-size:12px; }
+    @media (max-width:720px) {
+      .score-panel, .grid3 { grid-template-columns:1fr; }
+      .page { padding:24px; }
     }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 40px 24px;
-      background:
-        radial-gradient(circle at top left, rgba(15, 118, 110, 0.14), transparent 34rem),
-        linear-gradient(180deg, #eef3f7, #f8fafc);
-    }
-
-    .report {
-      width: min(100%, 820px);
-      margin: 0 auto;
-      padding: 44px;
-      border: 1px solid rgba(16, 20, 28, 0.12);
-      border-radius: 28px;
-      background: #ffffff;
-      box-shadow: 0 24px 70px rgba(16, 20, 28, 0.12);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 42px;
-    }
-
-    .brand-name {
-      font-size: 28px;
-      font-weight: 900;
-      letter-spacing: -0.05em;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 96px;
-      padding: 10px 16px;
-      border-radius: 999px;
-      color: #115e59;
-      background: #ccfbf1;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 0;
-      color: #10141c;
-      font-size: clamp(34px, 8vw, 58px);
-      line-height: 0.98;
-      letter-spacing: -0.06em;
-    }
-
-    p {
-      margin: 0;
-      color: #334155;
-      line-height: 1.65;
-    }
-
-    .lede {
-      max-width: 620px;
-      margin-top: 18px;
-      font-size: 18px;
-    }
-
-    .score-panel {
-      display: grid;
-      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-      gap: 24px;
-      margin: 38px 0;
-    }
-
-    .score-card,
-    .detail-card {
-      border: 1px solid rgba(16, 20, 28, 0.1);
-      border-radius: 22px;
-      padding: 26px;
-      background: #f8fafc;
-    }
-
-    .score-label,
-    .detail-label {
-      color: #64748b;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .score {
-      margin: 10px 0;
-      color: #0f766e;
-      font-size: 92px;
-      font-weight: 900;
-      line-height: 0.9;
-      letter-spacing: -0.08em;
-    }
-
-    .band {
-      color: #10141c;
-      font-size: 28px;
-      font-weight: 850;
-      letter-spacing: -0.04em;
-    }
-
-    .detail-list {
-      display: grid;
-      gap: 18px;
-      margin-top: 20px;
-    }
-
-    .detail-value {
-      margin-top: 2px;
-      color: #10141c;
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .note {
-      margin-top: 30px;
-      padding: 18px 20px;
-      border-left: 4px solid #d97706;
-      border-radius: 14px;
-      background: #fef3c7;
-    }
-
-    .footer {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      margin-top: 38px;
-      padding-top: 22px;
-      border-top: 1px solid rgba(16, 20, 28, 0.1);
-      color: #64748b;
-      font-size: 13px;
-    }
-
-    @media (max-width: 700px) {
-      body {
-        padding: 16px;
-      }
-
-      .report {
-        padding: 28px;
-      }
-
-      .brand,
-      .footer {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .score-panel {
-        grid-template-columns: 1fr;
-      }
-    }
-
     @media print {
-      body {
-        padding: 0;
-        background: #ffffff;
-      }
-
-      .report {
-        width: 100%;
-        min-height: 100vh;
-        border: 0;
-        border-radius: 0;
-        box-shadow: none;
-      }
+      body { padding:0; background:#fff; }
+      .page { box-shadow:none; border:0; border-radius:0; page-break-after:always; }
+      .certificate-page { page-break-before:always; }
     }
   </style>
 </head>
 <body>
-  <article class="report" aria-label="${escapeHtml(REPORT_TITLE)}">
+  <article class="page">
     <header class="brand">
       <div class="brand-name">IQMaster</div>
-      <div class="badge">Evaluation report</div>
+      <div class="badge">Personalized dossier</div>
     </header>
+    <h1>${safeName}'s cognitive assessment</h1>
+    <p class="lede">A personalized evaluation built from your exact answer pattern—not a generic template. Entertainment and education use only.</p>
 
-    <main>
-      <h1>${safeName}'s cognitive assessment report</h1>
-      <p class="lede">
-        This report summarizes the IQMaster culture-fair matrix assessment result for entertainment
-        and educational use. It is not a clinical diagnosis.
-      </p>
-
-      <section class="score-panel" aria-label="Score summary">
-        <div class="score-card">
-          <div class="score-label">Estimated IQ</div>
-          <div class="score">${report.iq}</div>
-          <div class="band">${safeBand}</div>
-        </div>
-
-        <div class="detail-card">
-          <div class="detail-label">Result details</div>
-          <div class="detail-list">
-            <div>
-              <p class="detail-label">Percentile</p>
-              <p class="detail-value">${ordinal(report.percentile)} percentile</p>
-            </div>
-            <div>
-              <p class="detail-label">Test ID</p>
-              <p class="detail-value">${safeTestId}</p>
-            </div>
-            <div>
-              <p class="detail-label">Issued</p>
-              <p class="detail-value">${safeDate}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="detail-card" aria-label="Assessment details" style="margin-bottom:24px">
-        <div class="detail-label">Assessment profile</div>
+    <section class="score-panel">
+      <div class="score-card">
+        <div class="label">Estimated IQ</div>
+        <div class="score">${report.iq}</div>
+        <div class="band">${safeBand}</div>
+      </div>
+      <div class="detail-card">
+        <div class="label">Result details</div>
         <div class="detail-list">
-          <div>
-            <p class="detail-label">Track / completion</p>
-            <p class="detail-value">${escapeHtml(report.track ?? 'adult')} · ${escapeHtml(report.completionMode ?? 'full')}</p>
-          </div>
-          <div>
-            <p class="detail-label">Accuracy</p>
-            <p class="detail-value">${report.accuracy ?? '—'}% (${report.answered ?? '—'}/${report.questionTotal ?? '—'})</p>
-          </div>
-          <div>
-            <p class="detail-label">Confidence</p>
-            <p class="detail-value">${escapeHtml(report.confidenceNote ?? 'Standard entertainment confidence')}</p>
-          </div>
+          <div><p class="label">Percentile</p><p class="detail-value">${ordinal(report.percentile)} percentile</p></div>
+          <div><p class="label">Accuracy</p><p class="detail-value">${report.accuracy ?? '—'}% (${report.answered ?? '—'}/${report.questionTotal ?? '—'})</p></div>
+          <div><p class="label">Track</p><p class="detail-value">${escapeHtml(report.track ?? 'adult')} · ${escapeHtml(report.completionMode ?? 'full')}</p></div>
+          <div><p class="label">Issued</p><p class="detail-value">${safeDate}</p></div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      ${
-        report.abilityProfile?.length
-          ? `<section class="detail-card" aria-label="Ability profile" style="margin-bottom:24px">
-        <div class="detail-label">Ability profile</div>
-        <div class="detail-list">
-          ${report.abilityProfile
+    ${countryHtml}
+    ${difficultyHtml}
+    ${insightsHtml}
+
+    ${
+      report.abilityProfile?.length
+        ? `<section class="card"><div class="label">Ability profile</div><div class="detail-list">${report.abilityProfile
             .map(
-              (item) => `<div>
-              <p class="detail-label">${escapeHtml(item.label)} · ${item.score}</p>
-              <p>${escapeHtml(item.note)}</p>
-            </div>`,
+              (item) => `<div><p class="label">${escapeHtml(item.label)} · ${item.score}</p><p>${escapeHtml(item.note)}</p></div>`,
             )
-            .join('')}
-        </div>
-      </section>`
+            .join('')}</div></section>`
+        : ''
+    }
+
+    ${itemsHtml}
+
+    <section class="note">
+      <p><strong>${safeBand}</strong> band · ${escapeHtml(report.confidenceNote ?? '')} ${escapeHtml(report.uncertainty ?? '')}
+      ${report.integrityNote ? ` ${escapeHtml(report.integrityNote)}` : ''}</p>
+      ${
+        report.portableCode
+          ? `<p style="margin-top:12px"><strong>Recovery code:</strong> <code style="word-break:break-all">${escapeHtml(report.portableCode)}</code></p>`
           : ''
       }
-
-      <section class="note" aria-label="Interpretation note">
-        <p>
-          A score in the <strong>${safeBand}</strong> band indicates how this performance compares
-          with IQMaster's reference scoring model. ${escapeHtml(report.uncertainty ?? '')}
-          ${report.integrityNote ? ` ${escapeHtml(report.integrityNote)}` : ''}
-          Repeating the assessment in a quiet setting can improve consistency for timed visual reasoning tasks.
-        </p>
-        ${
-          report.portableCode
-            ? `<p style="margin-top:12px"><strong>Recovery code:</strong> <code style="word-break:break-all">${escapeHtml(report.portableCode)}</code></p>`
-            : ''
-        }
-      </section>
-    </main>
+    </section>
 
     <footer class="footer">
       <span>Generated by IQMaster</span>
       <span>Report ID: ${safeTestId}</span>
     </footer>
+  </article>
+
+  <article class="page certificate-page" aria-label="Certificate">
+    <div class="certificate-shell">
+      <p class="eyebrow">IQMaster Certificate</p>
+      <h1>Certificate of Cognitive Assessment</h1>
+      <p>This certifies that</p>
+      <h2 style="font-family:Georgia,serif;font-size:34px;margin:14px 0">${safeName}</h2>
+      <p>completed the IQMaster culture-fair matrix assessment and achieved an estimated IQ score of</p>
+      <div class="score">${report.iq}</div>
+      <p>Band <strong>${safeBand}</strong> · Percentile <strong>${report.percentile}</strong>
+      ${country ? ` · ${escapeHtml(country.countryName)} context <strong>${country.delta >= 0 ? '+' : ''}${country.delta}</strong>` : ''}</p>
+      <div class="seal">IQ<br/>MASTER</div>
+      <p style="margin-top:18px;color:#6a7280;font-size:13px">Test ID ${safeTestId} · Issued ${safeDate}</p>
+    </div>
   </article>
 </body>
 </html>`
@@ -375,7 +300,6 @@ function printHtmlInFrame(html: string): boolean {
   iframe.onload = () => {
     const frameWindow = iframe.contentWindow
     if (!frameWindow) return
-
     frameWindow.focus()
     frameWindow.print()
     window.setTimeout(() => iframe.remove(), 1000)
@@ -383,7 +307,6 @@ function printHtmlInFrame(html: string): boolean {
 
   document.body.append(iframe)
   iframe.srcdoc = html
-
   return true
 }
 
@@ -403,7 +326,6 @@ export function printReportPdf(report: ReportDetails): boolean {
   reportWindow.document.close()
   reportWindow.focus()
   reportWindow.setTimeout(() => reportWindow.print(), 250)
-
   return true
 }
 
@@ -416,7 +338,6 @@ export function downloadReportHtml(report: ReportDetails, options: ReportFileOpt
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
-
   link.href = url
   link.download = options.filename ?? getReportFilename(report)
   link.rel = 'noopener'
@@ -424,6 +345,5 @@ export function downloadReportHtml(report: ReportDetails, options: ReportFileOpt
   link.click()
   link.remove()
   window.setTimeout(() => URL.revokeObjectURL(url), 0)
-
   return true
 }

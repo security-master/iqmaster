@@ -1,3 +1,6 @@
+import { getCountryByCode } from '../data/country-iq'
+import { getQuestionsForTrack, type TrackId } from './banks'
+
 export type Gender = 'female' | 'male' | 'other' | 'prefer_not'
 export type CompletionMode = 'full' | 'early'
 
@@ -6,6 +9,36 @@ export interface ScoreIntegrity {
   speedPenalty: number
   patternPenalty: number
   note: string
+}
+
+export interface ItemAnalysisRow {
+  index: number
+  difficulty: 1 | 2 | 3
+  status: 'correct' | 'incorrect' | 'skipped'
+  chosen: number | null
+  answer: number
+}
+
+export interface DifficultyBreakdown {
+  level: 1 | 2 | 3
+  label: string
+  correct: number
+  answered: number
+  accuracy: number
+}
+
+export interface CountryComparison {
+  countryCode: string
+  countryName: string
+  nationalAverage: number
+  userIq: number
+  delta: number
+  label: string
+}
+
+export interface PersonalizedInsight {
+  title: string
+  text: string
 }
 
 export interface ScoreResult {
@@ -24,11 +57,17 @@ export interface ScoreResult {
   uncertainty: string
   integrity: ScoreIntegrity
   abilityProfile: Array<{ label: string; score: number; note: string }>
+  itemAnalysis?: ItemAnalysisRow[]
+  difficultyBreakdown?: DifficultyBreakdown[]
+  countryComparison?: CountryComparison
+  personalizedInsights?: PersonalizedInsight[]
 }
 
 export interface ScoreOptions {
   elapsedSeconds?: number
   answers?: Array<number | null>
+  track?: TrackId
+  countryCode?: string
 }
 
 const BANDS: Array<{ min: number; label: string; summary: string }> = [
@@ -63,6 +102,12 @@ const BANDS: Array<{ min: number; label: string; summary: string }> = [
     summary: 'A retake in a quieter setting often improves consistency on timed matrix items.',
   },
 ]
+
+const DIFFICULTY_LABELS: Record<1 | 2 | 3, string> = {
+  1: 'Foundational',
+  2: 'Intermediate',
+  3: 'Advanced',
+}
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n))
@@ -127,13 +172,56 @@ function evaluateIntegrity(
   return { flags, speedPenalty, patternPenalty, note }
 }
 
-function buildAbilityProfile(accuracy: number, answered: number, questionTotal: number) {
+export function buildItemAnalysis(
+  answers: Array<number | null> | undefined,
+  track: TrackId = 'adult',
+): ItemAnalysisRow[] {
+  const bank = getQuestionsForTrack(track)
+  return bank.map((q, index) => {
+    const chosen = answers?.[index] ?? null
+    const status: ItemAnalysisRow['status'] =
+      chosen === null ? 'skipped' : chosen === q.answer ? 'correct' : 'incorrect'
+    return {
+      index,
+      difficulty: q.difficulty,
+      status,
+      chosen,
+      answer: q.answer,
+    }
+  })
+}
+
+export function buildDifficultyBreakdown(items: ItemAnalysisRow[]): DifficultyBreakdown[] {
+  return ([1, 2, 3] as const).map((level) => {
+    const subset = items.filter((i) => i.difficulty === level)
+    const answered = subset.filter((i) => i.status !== 'skipped')
+    const correct = answered.filter((i) => i.status === 'correct').length
+    return {
+      level,
+      label: DIFFICULTY_LABELS[level],
+      correct,
+      answered: answered.length,
+      accuracy: answered.length ? Math.round((correct / answered.length) * 100) : 0,
+    }
+  })
+}
+
+function buildAbilityProfile(
+  accuracy: number,
+  answered: number,
+  questionTotal: number,
+  breakdown: DifficultyBreakdown[],
+) {
   const base = Math.round(clamp(accuracy * 100, 20, 99))
   const coverageBoost = Math.round(clamp((answered / Math.max(questionTotal, 1)) * 8, 0, 8))
+  const easy = breakdown.find((b) => b.level === 1)
+  const mid = breakdown.find((b) => b.level === 2)
+  const hard = breakdown.find((b) => b.level === 3)
+
   return [
     {
       label: 'Pattern recognition',
-      score: clamp(base + 2, 20, 99),
+      score: clamp(Math.round((mid?.accuracy || base) * 0.55 + base * 0.45), 20, 99),
       note: 'Matrix rule detection across changing visual features.',
     },
     {
@@ -143,15 +231,123 @@ function buildAbilityProfile(accuracy: number, answered: number, questionTotal: 
     },
     {
       label: 'Processing consistency',
-      score: clamp(base - (answered < questionTotal ? 6 : 0), 20, 99),
+      score: clamp(
+        Math.round(((easy?.accuracy ?? base) + (mid?.accuracy ?? base)) / 2) -
+          (answered < questionTotal ? 6 : 0),
+        20,
+        99,
+      ),
       note: 'Stability of responding under timed visual load.',
     },
     {
       label: 'Abstract reasoning',
-      score: clamp(base + (accuracy > 0.7 ? 4 : -2), 20, 99),
-      note: 'Multi-rule inference without language dependence.',
+      score: clamp(Math.round((hard?.accuracy || base * 0.85) * 0.7 + base * 0.3), 20, 99),
+      note: 'Multi-rule inference on advanced items without language dependence.',
+    },
+    {
+      label: 'Visual discrimination',
+      score: clamp(Math.round((easy?.accuracy ?? base) * 0.4 + base * 0.6), 20, 99),
+      note: 'Fine discrimination of shape, spacing, and figure–ground relationships.',
+    },
+    {
+      label: 'Adaptive problem solving',
+      score: clamp(
+        Math.round(base + ((hard?.accuracy ?? 0) > (mid?.accuracy ?? 0) ? 5 : -3)),
+        20,
+        99,
+      ),
+      note: 'Ability to adjust strategy as item complexity increases.',
     },
   ]
+}
+
+function buildCountryComparison(iq: number, countryCode?: string): CountryComparison | undefined {
+  const country = getCountryByCode(countryCode)
+  if (!country) return undefined
+  const delta = iq - country.average
+  const label =
+    delta >= 15
+      ? `Well above the ${country.name} national average`
+      : delta >= 5
+        ? `Above the ${country.name} national average`
+        : delta >= -4
+          ? `Near the ${country.name} national average`
+          : delta >= -14
+            ? `Below the ${country.name} national average`
+            : `Well below the ${country.name} national average`
+
+  return {
+    countryCode: country.code,
+    countryName: country.name,
+    nationalAverage: country.average,
+    userIq: iq,
+    delta,
+    label,
+  }
+}
+
+function buildPersonalizedInsights(
+  iq: number,
+  band: string,
+  breakdown: DifficultyBreakdown[],
+  items: ItemAnalysisRow[],
+  integrity: ScoreIntegrity,
+  country?: CountryComparison,
+): PersonalizedInsight[] {
+  const insights: PersonalizedInsight[] = []
+  const correct = items.filter((i) => i.status === 'correct').length
+  const incorrect = items.filter((i) => i.status === 'incorrect').length
+  const skipped = items.filter((i) => i.status === 'skipped').length
+  const hard = breakdown.find((b) => b.level === 3)
+  const easy = breakdown.find((b) => b.level === 1)
+
+  insights.push({
+    title: 'Your response signature',
+    text: `You answered ${correct} items correctly, missed ${incorrect}, and left ${skipped} unanswered. Your estimated IQ of ${iq} places you in the ${band} band for this culture-fair session.`,
+  })
+
+  if (easy && easy.answered > 0) {
+    insights.push({
+      title: 'Foundational items',
+      text:
+        easy.accuracy >= 85
+          ? `Strong grip on foundational matrices (${easy.accuracy}% correct)—your basic visual rule detection is reliable.`
+          : `Foundational accuracy was ${easy.accuracy}%. Tightening early-item focus usually stabilizes the whole estimate.`,
+    })
+  }
+
+  if (hard && hard.answered > 0) {
+    insights.push({
+      title: 'Advanced matrices',
+      text:
+        hard.accuracy >= 60
+          ? `You held ground on advanced multi-rule items (${hard.accuracy}% correct)—a hallmark of stronger abstract reasoning.`
+          : `Advanced items were the main challenge (${hard.accuracy}% correct). Extra time on late-stage patterns often lifts this slice most.`,
+    })
+  }
+
+  if (country) {
+    insights.push({
+      title: 'National context',
+      text: `Compared with ${country.countryName}'s reported average of ${country.nationalAverage}, your score is ${
+        country.delta >= 0 ? `+${country.delta}` : `${country.delta}`
+      } points (${country.label.toLowerCase()}).`,
+    })
+  }
+
+  if (integrity.flags.length) {
+    insights.push({
+      title: 'Integrity notes',
+      text: integrity.note,
+    })
+  } else {
+    insights.push({
+      title: 'Session quality',
+      text: 'Response timing and choice patterns look consistent for an entertainment assessment—no integrity penalties were applied.',
+    })
+  }
+
+  return insights
 }
 
 /** Map answered-item accuracy to an IQ-like score (mean 100, SD ~15), entertainment use. */
@@ -169,6 +365,8 @@ export function scoreAnswers(
   const confidence =
     answered < 8 ? 'low' : answered < questionTotal ? 'medium' : 'standard'
   const integrity = evaluateIntegrity(answered, questionTotal, options.elapsedSeconds, options.answers)
+  const itemAnalysis = buildItemAnalysis(options.answers, options.track ?? 'adult')
+  const difficultyBreakdown = buildDifficultyBreakdown(itemAnalysis)
   const reliability =
     answered === 0
       ? 0
@@ -178,7 +376,6 @@ export function scoreAnswers(
           ? clamp(0.6 + coverage * 0.35, 0.65, 0.95)
           : 1
   const integrityFactor = clamp(1 - integrity.speedPenalty - integrity.patternPenalty, 0.45, 1)
-  // Soft age adjustment: peak mid-20s for fluid reasoning entertainment curve
   const ageFactor = age < 16 ? -4 : age <= 30 ? 2 : age <= 45 ? 0 : age <= 60 ? -2 : -5
   const z = (accuracy - 0.55) / 0.18
   const iq = Math.round(
@@ -208,14 +405,25 @@ export function scoreAnswers(
     confidence === 'low'
       ? 'Provisional percentile context'
       : percentile >= 98
-      ? 'Top 2% globally'
-      : percentile >= 90
-        ? 'Top 10% globally'
-        : percentile >= 75
-          ? 'Top quartile globally'
-          : percentile >= 50
-            ? 'Above the global midpoint'
-            : 'Building toward the global midpoint'
+        ? 'Top 2% globally'
+        : percentile >= 90
+          ? 'Top 10% globally'
+          : percentile >= 75
+            ? 'Top quartile globally'
+            : percentile >= 50
+              ? 'Above the global midpoint'
+              : 'Building toward the global midpoint'
+
+  const countryComparison = buildCountryComparison(iq, options.countryCode)
+  const abilityProfile = buildAbilityProfile(accuracy, answered, questionTotal, difficultyBreakdown)
+  const personalizedInsights = buildPersonalizedInsights(
+    iq,
+    band.label,
+    difficultyBreakdown,
+    itemAnalysis,
+    integrity,
+    countryComparison,
+  )
 
   return {
     iq,
@@ -235,23 +443,61 @@ export function scoreAnswers(
     confidenceNote,
     uncertainty,
     integrity,
-    abilityProfile: buildAbilityProfile(accuracy, answered, questionTotal),
+    abilityProfile,
+    itemAnalysis,
+    difficultyBreakdown,
+    countryComparison,
+    personalizedInsights,
   }
 }
 
-/** Normalize older stored results that predate integrity/ability fields. */
-export function normalizeScoreResult(result: ScoreResult): ScoreResult {
+/** Normalize older stored results; optionally rebuild analysis from live answers. */
+export function normalizeScoreResult(
+  result: ScoreResult,
+  options?: { answers?: Array<number | null>; track?: TrackId; countryCode?: string },
+): ScoreResult {
+  const itemAnalysis =
+    result.itemAnalysis ??
+    (options?.answers ? buildItemAnalysis(options.answers, options.track ?? 'adult') : undefined)
+  const difficultyBreakdown =
+    result.difficultyBreakdown ?? (itemAnalysis ? buildDifficultyBreakdown(itemAnalysis) : undefined)
+  const countryComparison =
+    result.countryComparison ?? buildCountryComparison(result.iq, options?.countryCode)
+  const integrity = result.integrity ?? {
+    flags: [],
+    speedPenalty: 0,
+    patternPenalty: 0,
+    note: 'No integrity warnings recorded for this stored result.',
+  }
+  const abilityProfile =
+    result.abilityProfile ??
+    buildAbilityProfile(
+      (result.accuracy ?? 0) / 100,
+      result.answered ?? 0,
+      result.questionTotal ?? result.answered ?? 0,
+      difficultyBreakdown ?? [],
+    )
+  const personalizedInsights =
+    result.personalizedInsights ??
+    (itemAnalysis && difficultyBreakdown
+      ? buildPersonalizedInsights(
+          result.iq,
+          result.band,
+          difficultyBreakdown,
+          itemAnalysis,
+          integrity,
+          countryComparison,
+        )
+      : undefined)
+
   return {
     ...result,
-    integrity: result.integrity ?? {
-      flags: [],
-      speedPenalty: 0,
-      patternPenalty: 0,
-      note: 'No integrity warnings recorded for this stored result.',
-    },
-    abilityProfile:
-      result.abilityProfile ??
-      buildAbilityProfile((result.accuracy ?? 0) / 100, result.answered ?? 0, result.questionTotal ?? result.answered ?? 0),
+    integrity,
+    abilityProfile,
+    itemAnalysis,
+    difficultyBreakdown,
+    countryComparison,
+    personalizedInsights,
   }
 }
 

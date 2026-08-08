@@ -1,30 +1,15 @@
-import { useState, type CSSProperties } from 'react'
+import { useState } from 'react'
 import {
   canUseNativeShare,
+  copyShareLink,
   getShareLinks,
   shareResult,
   type NativeShareStatus,
   type ShareDetails,
 } from '../lib/report/share'
+import { SocialIcon } from './SocialIcons'
 
 export type ShareButtonsProps = ShareDetails
-
-const rowStyle = {
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: '0.75rem',
-  alignItems: 'center',
-} satisfies CSSProperties
-
-const compactButtonStyle = {
-  padding: '0.78rem 1.05rem',
-} satisfies CSSProperties
-
-const statusStyle = {
-  minHeight: '1.35rem',
-  color: 'var(--muted)',
-  fontSize: '0.9rem',
-} satisfies CSSProperties
 
 function getStatusMessage(status: NativeShareStatus | 'idle'): string {
   switch (status) {
@@ -33,7 +18,9 @@ function getStatusMessage(status: NativeShareStatus | 'idle'): string {
     case 'dismissed':
       return 'Share cancelled.'
     case 'unavailable':
-      return 'Use one of the social buttons to share.'
+      return 'Choose a network below to share in one tap.'
+    case 'copied':
+      return 'Result text and link copied.'
     default:
       return ''
   }
@@ -48,37 +35,57 @@ export function ShareButtons(props: ShareButtonsProps) {
     setStatus(await shareResult(props))
   }
 
-  return (
-    <div aria-label="Share your IQMaster result">
-      <div style={rowStyle}>
-        {hasNativeShare && (
-          <button
-            className="btn btn-primary"
-            type="button"
-            style={compactButtonStyle}
-            aria-label="Share your IQMaster result using your device share menu"
-            onClick={onNativeShare}
-          >
-            Share result
-          </button>
-        )}
+  async function onCopy() {
+    const ok = await copyShareLink(props)
+    setStatus(ok ? 'copied' : 'unavailable')
+  }
 
-        {links.map((link) => (
-          <a
-            className="btn btn-secondary"
-            key={link.platform}
-            href={link.url}
-            target="_blank"
-            rel="noreferrer"
-            style={compactButtonStyle}
-            aria-label={link.ariaLabel}
-          >
-            {link.label}
-          </a>
-        ))}
+  return (
+    <div className="share-panel" aria-label="Share your IQMaster result">
+      <div className="share-panel__head">
+        <p className="eyebrow">One-tap social share</p>
+        <h3>Share your result</h3>
+        <p>Post to the network you already use—icons cover a wide set of platforms.</p>
       </div>
 
-      <p aria-live="polite" style={statusStyle}>
+      {hasNativeShare && (
+        <button className="btn btn-primary share-native" type="button" onClick={onNativeShare}>
+          Share via device
+        </button>
+      )}
+
+      <div className="share-grid">
+        {links.map((link) =>
+          link.action === 'copy' ? (
+            <button
+              key={link.platform}
+              type="button"
+              className={`share-icon-btn share-icon-btn--${link.platform}`}
+              aria-label={link.ariaLabel}
+              title={link.label}
+              onClick={onCopy}
+            >
+              <SocialIcon platform={link.platform} className="share-icon" />
+              <span>{link.label}</span>
+            </button>
+          ) : (
+            <a
+              key={link.platform}
+              className={`share-icon-btn share-icon-btn--${link.platform}`}
+              href={link.url}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={link.ariaLabel}
+              title={link.label}
+            >
+              <SocialIcon platform={link.platform} className="share-icon" />
+              <span>{link.label}</span>
+            </a>
+          ),
+        )}
+      </div>
+
+      <p className="share-status" aria-live="polite">
         {getStatusMessage(status)}
       </p>
     </div>

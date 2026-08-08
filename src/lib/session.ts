@@ -16,6 +16,7 @@ export interface TestSession {
     name: string
     age: number
     gender: Gender
+    countryCode?: string
   }
   completionMode?: CompletionMode
   paid: boolean
@@ -110,7 +111,7 @@ export function finishSession(testId: string) {
 
 export function completeProfile(
   testId: string,
-  profile: { name: string; age: number; gender: Gender },
+  profile: { name: string; age: number; gender: Gender; countryCode?: string },
 ) {
   const session = getSession(testId)
   if (!session) return null
@@ -124,6 +125,8 @@ export function completeProfile(
   session.result = scoreAnswers(correct, answeredCount, profile.age, total, {
     elapsedSeconds: session.elapsedSeconds,
     answers: session.answers,
+    track: session.track,
+    countryCode: profile.countryCode,
   })
   saveSession(session)
   return session

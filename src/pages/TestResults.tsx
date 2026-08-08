@@ -30,17 +30,24 @@ export function TestResults() {
   }
 
   const { profile } = session
-  const result = normalizeScoreResult(session.result)
+  const result = normalizeScoreResult(session.result, {
+    answers: session.answers,
+    track: session.track,
+    countryCode: profile.countryCode,
+  })
   const completionMode = session.completionMode ?? (result.answered >= result.questionTotal ? 'full' : 'early')
   const completionLabel = completionMode === 'full' ? 'Full completion' : 'Early finish'
+  const country = result.countryComparison
+  const maxBar = Math.max(155, result.iq, country?.nationalAverage ?? 100, 100)
+  const issued = new Date(session.finishedAt ?? session.createdAt).toLocaleDateString()
 
   return (
-    <div className="container test-shell">
+    <div className="container test-shell results-page">
       <p className="eyebrow">{t('results.title')}</p>
-      <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)' }}>Assessment complete</h1>
-      <p style={{ marginTop: '0.75rem' }}>
-        Test ID <strong>{testId}</strong> · Security code <strong>{session.securityCode}</strong> ·
-        Time {formatElapsed(session.elapsedSeconds)} · Answered {result.answered}/{result.questionTotal}
+      <h1 className="results-title">Your personalized IQ dossier</h1>
+      <p className="results-sub">
+        Test ID <strong>{testId}</strong> · Security code <strong>{session.securityCode}</strong> · Time{' '}
+        {formatElapsed(session.elapsedSeconds)} · Answered {result.answered}/{result.questionTotal}
       </p>
       {syncNote && <p className="muted">{syncNote}</p>}
 
@@ -72,15 +79,122 @@ export function TestResults() {
             <li>{result.integrity.note}</li>
             <li>
               Profile: {profile.name}, age {profile.age}
+              {country ? ` · ${country.countryName}` : ''}
             </li>
           </ul>
-          <button className="btn btn-secondary no-print" style={{ marginTop: '1.2rem' }} onClick={() => window.print()}>
+          <button
+            className="btn btn-secondary no-print"
+            style={{ marginTop: '1.2rem' }}
+            onClick={() => window.print()}
+          >
             Print certificate
           </button>
         </div>
       </div>
 
-      <section className="section" style={{ paddingTop: '2rem' }}>
+      {country && (
+        <section className="section results-block">
+          <p className="eyebrow">National statistics</p>
+          <h2 className="section-title section-title--wide">Your score vs country averages</h2>
+          <p className="section-lead">{country.label}</p>
+          <div className="stat-compare">
+            <div className="stat-compare__row">
+              <div className="stat-compare__meta">
+                <strong>Your IQ</strong>
+                <span>{result.iq}</span>
+              </div>
+              <div className="stat-compare__bar">
+                <span style={{ width: `${(result.iq / maxBar) * 100}%` }} className="is-you" />
+              </div>
+            </div>
+            <div className="stat-compare__row">
+              <div className="stat-compare__meta">
+                <strong>{country.countryName} average</strong>
+                <span>{country.nationalAverage}</span>
+              </div>
+              <div className="stat-compare__bar">
+                <span style={{ width: `${(country.nationalAverage / maxBar) * 100}%` }} />
+              </div>
+            </div>
+            <div className="stat-compare__row">
+              <div className="stat-compare__meta">
+                <strong>Global mean</strong>
+                <span>100</span>
+              </div>
+              <div className="stat-compare__bar">
+                <span style={{ width: `${(100 / maxBar) * 100}%` }} />
+              </div>
+            </div>
+            <p className="muted stat-compare__delta">
+              Difference vs {country.countryName}:{' '}
+              <strong>
+                {country.delta >= 0 ? '+' : ''}
+                {country.delta}
+              </strong>{' '}
+              IQ points
+            </p>
+          </div>
+        </section>
+      )}
+
+      {result.personalizedInsights && result.personalizedInsights.length > 0 && (
+        <section className="section results-block">
+          <p className="eyebrow">Personalized evaluation</p>
+          <h2 className="section-title section-title--wide">Built from your answers</h2>
+          <div className="insight-list">
+            {result.personalizedInsights.map((insight) => (
+              <article className="insight-card" key={insight.title}>
+                <h3>{insight.title}</h3>
+                <p>{insight.text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {result.difficultyBreakdown && (
+        <section className="section results-block">
+          <p className="eyebrow">Difficulty breakdown</p>
+          <h2 className="section-title">Correct vs incorrect by level</h2>
+          <div className="difficulty-grid">
+            {result.difficultyBreakdown.map((d) => (
+              <article className="difficulty-card" key={d.level}>
+                <p className="eyebrow">Level {d.level}</p>
+                <h3>{d.label}</h3>
+                <p className="difficulty-card__score">{d.accuracy}%</p>
+                <p>
+                  {d.correct}/{d.answered} correct
+                </p>
+                <div className="stat-compare__bar">
+                  <span style={{ width: `${d.accuracy}%` }} className="is-you" />
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {result.itemAnalysis && (
+        <section className="section results-block">
+          <p className="eyebrow">Answer review</p>
+          <h2 className="section-title section-title--wide">Every item mapped</h2>
+          <p className="section-lead">Green = correct · Red = incorrect · Grey = skipped</p>
+          <div className="item-review">
+            {result.itemAnalysis.map((item) => (
+              <div
+                key={item.index}
+                className={`item-chip item-chip--${item.status}`}
+                title={`Item ${item.index + 1} · Difficulty ${item.difficulty} · ${item.status}`}
+              >
+                <span>{item.index + 1}</span>
+                <small>D{item.difficulty}</small>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="section results-block">
         <p className="eyebrow">Ability profile</p>
         <div className="ability-grid">
           {result.abilityProfile.map((item) => (
@@ -121,29 +235,47 @@ export function TestResults() {
           track={session.track}
           completionMode={completionMode}
           portableCode={portableCode}
+          countryComparison={result.countryComparison}
+          difficultyBreakdown={result.difficultyBreakdown}
+          personalizedInsights={result.personalizedInsights}
+          itemAnalysis={result.itemAnalysis}
+          age={profile.age}
+          countryCode={profile.countryCode}
         />
       </div>
 
-      <div className="certificate" style={{ marginTop: '2rem' }} id="certificate">
+      <div className="certificate certificate--elite" id="certificate">
+        <div className="certificate__ornament" aria-hidden="true" />
         <p className="eyebrow">IQMaster Certificate</p>
         <h2>Certificate of Cognitive Assessment</h2>
         <p>This certifies that</p>
-        <h3 style={{ fontSize: '2rem', margin: '0.55rem 0 0.8rem' }}>{profile.name}</h3>
+        <h3 className="certificate__name">{profile.name}</h3>
         <p>
           completed the IQMaster culture-fair matrix assessment and achieved an estimated IQ score of
         </p>
-        <div className="score-value" style={{ fontSize: '4.2rem', margin: '0.7rem 0' }}>
-          {result.iq}
-        </div>
+        <div className="score-value certificate__score">{result.iq}</div>
         <p>
           Band: <strong>{result.band}</strong> · Percentile: <strong>{result.percentile}</strong>
+          {country ? (
+            <>
+              {' '}
+              · {country.countryName}:{' '}
+              <strong>
+                {country.delta >= 0 ? '+' : ''}
+                {country.delta}
+              </strong>
+            </>
+          ) : null}
         </p>
-        <p className="muted" style={{ marginTop: '0.6rem' }}>
-          {completionLabel} · {result.answered}/{result.questionTotal} items answered · {result.confidence}{' '}
-          confidence
+        <div className="certificate__seal" aria-hidden="true">
+          IQ
+          <span>MASTER</span>
+        </div>
+        <p className="muted certificate__meta">
+          {completionLabel} · {result.answered}/{result.questionTotal} items · {result.confidence} confidence
         </p>
-        <p className="muted" style={{ marginTop: '1rem' }}>
-          Test ID {testId} · Issued {new Date(session.finishedAt ?? session.createdAt).toLocaleDateString()}
+        <p className="muted certificate__meta">
+          Test ID {testId} · Issued {issued}
         </p>
       </div>
     </div>
