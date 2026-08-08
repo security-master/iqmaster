@@ -6,7 +6,7 @@ A modern, culture-fair online IQ test experience — inspired by classic certifi
 
 - Vite + React + TypeScript
 - React Router
-- Netlify (SPA hosting + Functions)
+- Cloudflare Pages (+ Pages Functions)
 - Local session storage for demo unlock flow
 
 ## Features
@@ -31,9 +31,30 @@ npm run build
 npm run preview
 ```
 
-## Deploy (Netlify)
+## Deploy (Cloudflare Pages)
 
-Connected Git deploys use `netlify.toml`. For production payments, replace the demo unlock in `src/pages/TestPayment.tsx` with Stripe Checkout.
+### Option A — GitHub Actions (recommended)
+
+1. Create a Cloudflare API token with **Cloudflare Pages: Edit**
+2. Add repo secrets:
+   - `CLOUDFLARE_API_TOKEN`
+   - `CLOUDFLARE_ACCOUNT_ID`
+3. Push to `main` (or run the **Deploy Cloudflare Pages** workflow)
+
+### Option B — Wrangler CLI
+
+```bash
+npm run build
+npx wrangler pages deploy dist --project-name=iqmaster
+```
+
+### Option C — Cloudflare dashboard Git integration
+
+Connect `security-master/iqmaster` in Workers & Pages → Create → Connect to Git.
+
+- Build command: `npm run build`
+- Output directory: `dist`
+- Framework preset: Vite
 
 ## Note
 

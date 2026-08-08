@@ -15,7 +15,12 @@ dist-ssr
 .env.*
 !.env.example
 
-# Netlify
+# Cloudflare / Wrangler
+.wrangler
+.dev.vars
+.nf-test
+
+# Netlify (legacy)
 .netlify
 
 # Editor

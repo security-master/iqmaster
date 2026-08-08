@@ -8,11 +8,16 @@ export function Contact() {
     const form = e.currentTarget
     const data = new FormData(form)
     try {
-      await fetch('/', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(data as unknown as Record<string, string>).toString(),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data.get('name'),
+          email: data.get('email'),
+          message: data.get('message'),
+        }),
       })
+      if (!res.ok) throw new Error('failed')
       setStatus('sent')
       form.reset()
     } catch {
@@ -26,20 +31,7 @@ export function Contact() {
       <h1>Talk to the team</h1>
       <p>Questions about your Test ID, certificate, or partnership ideas — send a note.</p>
 
-      <form
-        className="form-grid"
-        style={{ marginTop: '2rem' }}
-        name="contact"
-        method="POST"
-        data-netlify="true"
-        onSubmit={onSubmit}
-      >
-        <input type="hidden" name="form-name" value="contact" />
-        <p hidden>
-          <label>
-            Don’t fill this out: <input name="bot-field" />
-          </label>
-        </p>
+      <form className="form-grid" style={{ marginTop: '2rem' }} onSubmit={onSubmit}>
         <div className="field">
           <label htmlFor="name">Name</label>
           <input id="name" name="name" required />

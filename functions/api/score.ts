@@ -1,4 +1,3 @@
-import type { Config, Context } from '@netlify/functions'
 import { QUESTIONS } from '../../src/data/questions'
 import { scoreAnswers } from '../../src/lib/iq'
 
@@ -7,14 +6,10 @@ interface ScoreBody {
   age?: number
 }
 
-export default async (req: Request, _context: Context) => {
-  if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 })
-  }
-
+export async function onRequestPost(context: { request: Request }): Promise<Response> {
   let body: ScoreBody
   try {
-    body = (await req.json()) as ScoreBody
+    body = (await context.request.json()) as ScoreBody
   } catch {
     return Response.json({ error: 'Invalid JSON' }, { status: 400 })
   }
@@ -28,9 +23,4 @@ export default async (req: Request, _context: Context) => {
   const correct = QUESTIONS.reduce((sum, q, i) => sum + (answers[i] === q.answer ? 1 : 0), 0)
   const result = scoreAnswers(correct, QUESTIONS.length, age)
   return Response.json({ result })
-}
-
-export const config: Config = {
-  path: '/api/score',
-  method: 'POST',
 }
