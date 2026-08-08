@@ -63,13 +63,6 @@ export function Home() {
         title="IQMaster — Online IQ Test & Certificate"
         description="Take a culture-fair 30-question IQ test online. Get your score, percentile, analysis, and printable certificate with transparent pricing."
       />
-      <div className="progress-banner">
-        <div className="container progress-banner__inner">
-          <span>Platform v1 ilerleme: 100% — tüm iş akışları tamam</span>
-          <Link to="/progress">İlerleme panosunu aç →</Link>
-        </div>
-      </div>
-
       <section className="hero hero--photo">
         <div className="hero-media" aria-hidden="true">
           <img

@@ -22,7 +22,6 @@ import { TestComplete } from './pages/TestComplete'
 import { TestPayment } from './pages/TestPayment'
 import { TestQuestion } from './pages/TestQuestion'
 import { TestResults } from './pages/TestResults'
-import { ProgressBoard } from './pages/ProgressBoard'
 import { TestStart } from './pages/TestStart'
 import { JoinInvite } from './pages/JoinInvite'
 
@@ -35,7 +34,7 @@ export default function App() {
         <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="progress" element={<ProgressBoard />} />
+          <Route path="progress" element={<Navigate to="/" replace />} />
           <Route path="about" element={<About />} />
           <Route path="faq" element={<FAQ />} />
           <Route path="pricing" element={<Pricing />} />

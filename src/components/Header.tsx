@@ -28,9 +28,6 @@ export function Header() {
         </button>
 
         <nav className={`nav ${open ? 'open' : ''}`}>
-          <NavLink to="/progress" onClick={() => setOpen(false)}>
-            {t('nav.progress')}
-          </NavLink>
           <NavLink to="/age-groups" onClick={() => setOpen(false)}>
             {t('nav.ageGroups')}
           </NavLink>
