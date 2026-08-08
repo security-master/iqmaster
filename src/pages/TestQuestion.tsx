@@ -45,6 +45,7 @@ export function TestQuestion() {
 
   function finishNow() {
     const latestSession = getSession(testId) ?? session
+    if (!latestSession) return
     const currentAnsweredCount = countAnswered(latestSession.answers)
     if (
       currentAnsweredCount < 8 &&
