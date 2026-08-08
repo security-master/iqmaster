@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { QUESTIONS } from '../data/questions'
 import { createSession } from '../lib/session'
 
 export function TestStart() {
@@ -18,8 +19,9 @@ export function TestStart() {
         Ready to start the IQ test?
       </h1>
       <p style={{ marginTop: '1rem', maxWidth: '58ch' }}>
-        Find a quiet place, close extra tabs, and silence notifications. The test has 30 questions
-        with rising difficulty. Maximum time: 60 minutes. You can move back and forth before finishing.
+        Find a quiet place, close extra tabs, and silence notifications. The test has {QUESTIONS.length}{' '}
+        visual pattern questions with rising difficulty. Maximum time: 60 minutes. You can move back
+        and forth, or finish early for a confidence-adjusted score.
       </p>
 
       <div className="price-box" style={{ marginTop: '1.75rem' }}>

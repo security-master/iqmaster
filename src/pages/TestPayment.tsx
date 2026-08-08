@@ -25,7 +25,7 @@ export function TestPayment() {
   return (
     <div className="container test-shell">
       <p className="eyebrow">Checkout</p>
-      <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>Your IQ test is complete</h1>
+      <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>Your IQ test is submitted</h1>
       <p style={{ marginTop: '0.8rem' }}>
         Unlock the full package for a flat <strong>$19</strong>. No subscription.
       </p>
@@ -41,6 +41,9 @@ export function TestPayment() {
           <div className="price">$19</div>
           <ul className="checklist">
             <li>IQ score evaluation</li>
+            <li>
+              Answered items scored: {session.result.answered}/{session.result.questionTotal}
+            </li>
             <li>Score analysis & percentile</li>
             <li>World ranking context</li>
             <li>Personalized printable certificate</li>

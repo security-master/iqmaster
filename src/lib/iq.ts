@@ -1,4 +1,5 @@
 export type Gender = 'female' | 'male' | 'other' | 'prefer_not'
+export type CompletionMode = 'full' | 'early'
 
 export interface ScoreResult {
   iq: number
@@ -7,8 +8,13 @@ export interface ScoreResult {
   summary: string
   correct: number
   total: number
+  answered: number
+  questionTotal: number
   accuracy: number
   worldRankLabel: string
+  confidence: 'standard' | 'medium' | 'low'
+  confidenceNote: string
+  uncertainty: string
 }
 
 const BANDS: Array<{ min: number; label: string; summary: string }> = [
@@ -63,17 +69,44 @@ export function ordinal(n: number): string {
   }
 }
 
-/** Map raw accuracy to an IQ-like score (mean 100, SD ~15), entertainment use. */
-export function scoreAnswers(correctCount: number, total: number, age: number): ScoreResult {
-  const accuracy = total === 0 ? 0 : correctCount / total
+/** Map answered-item accuracy to an IQ-like score (mean 100, SD ~15), entertainment use. */
+export function scoreAnswers(correctCount: number, answeredCount: number, age: number, questionTotal = answeredCount): ScoreResult {
+  const answered = Math.round(clamp(answeredCount, 0, questionTotal))
+  const correct = Math.round(clamp(correctCount, 0, answered))
+  const accuracy = answered === 0 ? 0 : correct / answered
+  const coverage = questionTotal === 0 ? 0 : answered / questionTotal
+  const confidence =
+    answered < 8 ? 'low' : answered < questionTotal ? 'medium' : 'standard'
+  const reliability =
+    answered === 0
+      ? 0
+      : confidence === 'low'
+        ? clamp(0.3 + answered * 0.03, 0.3, 0.51)
+        : confidence === 'medium'
+          ? clamp(0.6 + coverage * 0.35, 0.65, 0.95)
+          : 1
   // Soft age adjustment: peak mid-20s for fluid reasoning entertainment curve
   const ageFactor = age < 16 ? -4 : age <= 30 ? 2 : age <= 45 ? 0 : age <= 60 ? -2 : -5
   const z = (accuracy - 0.55) / 0.18
-  const iq = Math.round(clamp(100 + z * 15 + ageFactor, 70, 155))
+  const iq = Math.round(clamp(answered === 0 ? 100 : 100 + z * 15 * reliability + ageFactor * reliability, 70, 155))
   const percentile = Math.round(clamp(normalCdf((iq - 100) / 15) * 100, 1, 99))
   const band = BANDS.find((b) => iq >= b.min) ?? BANDS[BANDS.length - 1]
+  const uncertainty =
+    confidence === 'low'
+      ? 'Estimated uncertainty: +/- 15 IQ points because fewer than 8 items were answered.'
+      : confidence === 'medium'
+        ? `Estimated uncertainty: +/- ${Math.round(clamp(10 - coverage * 4, 6, 9))} IQ points because the test was finished early.`
+        : 'Estimated uncertainty: +/- 4 IQ points for this entertainment assessment.'
+  const confidenceNote =
+    confidence === 'low'
+      ? `Low confidence: only ${answered} of ${questionTotal} items were answered, so this is a provisional snapshot rather than a stable estimate.`
+      : confidence === 'medium'
+        ? `Moderate confidence: the estimate is based on ${answered} answered items and is scaled toward the average to reflect the unfinished portion.`
+        : `Standard confidence: all ${questionTotal} visual items were answered.`
   const worldRankLabel =
-    percentile >= 98
+    confidence === 'low'
+      ? 'Provisional percentile context'
+      : percentile >= 98
       ? 'Top 2% globally'
       : percentile >= 90
         ? 'Top 10% globally'
@@ -86,12 +119,20 @@ export function scoreAnswers(correctCount: number, total: number, age: number): 
   return {
     iq,
     percentile,
-    band: band.label,
-    summary: band.summary,
-    correct: correctCount,
-    total,
+    band: confidence === 'low' ? `Provisional / Low confidence (${band.label})` : band.label,
+    summary:
+      confidence === 'standard'
+        ? band.summary
+        : `${band.summary} ${uncertainty}`,
+    correct,
+    total: answered,
+    answered,
+    questionTotal,
     accuracy: Math.round(accuracy * 100),
     worldRankLabel,
+    confidence,
+    confidenceNote,
+    uncertainty,
   }
 }
 

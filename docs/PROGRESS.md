@@ -8,12 +8,12 @@
 
 | Metrik | Değer |
 |--------|-------|
-| **Toplam** | **15%** |
+| **Toplam** | **48%** |
 | Faz | v1 paralel uygulama |
-| Durum | 5 ajan çalışıyor |
+| Durum | D+E bitti · A/B/C sürüyor · F kısmi entegrasyon |
 
 ```
-[███░░░░░░░░░░░░░░░░░] 15%
+[█████████░░░░░░░░░░░] 48%
 ```
 
 ## İş akışları
@@ -25,7 +25,7 @@
 | C | Yaş grupları + çocuk bankaları | `bc-42f69d55…` | test-catalog, kids/teens banks, AgeSelect | 5% | running |
 | D | B2B paket/kredi iskeleti | `bc-2f3779d6…` | packages, billing, OrgDashboard | 100% | done |
 | E | PDF + sosyal paylaşım | `bc-c74bb61b…` | report/*, ShareButtons, ReportActions | 100% | done |
-| F | Entegrasyon + build + push | orchestrator | App.tsx routing, çakışma çözümü | 10% | waiting_on_agents |
+| F | Entegrasyon + build + push | orchestrator | App.tsx routing, çakışma çözümü | 35% | partial — D/E routes wired |
 
 ## v1 kabul kriterleri
 

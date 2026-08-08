@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { QUESTIONS } from '../data/questions'
 import type { Gender } from '../lib/iq'
-import { completeProfile, getSession } from '../lib/session'
+import { completeProfile, countAnswered, getSession } from '../lib/session'
 
 export function TestComplete() {
   const { testId = '' } = useParams()
@@ -10,6 +11,9 @@ export function TestComplete() {
   const [error, setError] = useState('')
 
   if (!session) return <Navigate to="/iq-test" replace />
+
+  const answeredCount = session.answeredCount ?? countAnswered(session.answers)
+  const completionMode = answeredCount >= QUESTIONS.length ? 'full' : 'early'
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -28,10 +32,14 @@ export function TestComplete() {
   return (
     <div className="container test-shell">
       <p className="eyebrow">Completed</p>
-      <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>Congratulations on finishing the test</h1>
+      <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>Your test has been submitted</h1>
       <p style={{ marginTop: '0.8rem', maxWidth: '52ch' }}>
         Enter your details to personalize the certificate and age-normed report. Test ID:{' '}
         <strong>{testId}</strong>
+      </p>
+      <p className="notice" style={{ marginTop: '1rem' }}>
+        Answered {answeredCount} of {QUESTIONS.length} items ·{' '}
+        {completionMode === 'full' ? 'Full completion' : 'Early finish with confidence-adjusted scoring'}
       </p>
 
       <form className="form-grid" style={{ marginTop: '2rem' }} onSubmit={onSubmit}>

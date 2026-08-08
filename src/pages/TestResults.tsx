@@ -13,6 +13,8 @@ export function TestResults() {
   }
 
   const { profile, result } = session
+  const completionMode = session.completionMode ?? (result.answered >= result.questionTotal ? 'full' : 'early')
+  const completionLabel = completionMode === 'full' ? 'Full completion' : 'Early finish'
 
   return (
     <div className="container test-shell">
@@ -20,7 +22,7 @@ export function TestResults() {
       <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)' }}>Assessment complete</h1>
       <p style={{ marginTop: '0.75rem' }}>
         Test ID <strong>{testId}</strong> · Security code <strong>{session.securityCode}</strong> ·
-        Time {formatElapsed(session.elapsedSeconds)}
+        Time {formatElapsed(session.elapsedSeconds)} · Answered {result.answered}/{result.questionTotal}
       </p>
 
       <div className="results-hero" style={{ marginTop: '2rem' }}>
@@ -43,6 +45,11 @@ export function TestResults() {
             <li>
               Accuracy: {result.accuracy}% ({result.correct}/{result.total})
             </li>
+            <li>
+              Completion: {completionLabel} ({result.answered}/{result.questionTotal} answered)
+            </li>
+            <li>Confidence: {result.confidenceNote}</li>
+            <li>{result.uncertainty}</li>
             <li>Profile: {profile.name}, age {profile.age}</li>
             <li>Gender selection recorded for reporting context</li>
             <li>Keep your security code to reopen this page later</li>
@@ -66,6 +73,9 @@ export function TestResults() {
         </div>
         <p>
           Band: <strong>{result.band}</strong> · Percentile: <strong>{result.percentile}</strong>
+        </p>
+        <p className="muted" style={{ marginTop: '0.6rem' }}>
+          {completionLabel} · {result.answered}/{result.questionTotal} items answered · {result.confidence} confidence
         </p>
         <p className="muted" style={{ marginTop: '1rem' }}>
           Test ID {testId} · Issued {new Date(session.finishedAt ?? session.createdAt).toLocaleDateString()}

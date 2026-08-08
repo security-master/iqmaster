@@ -94,10 +94,6 @@ function arrow(dir: 'up' | 'down' | 'left' | 'right' | 'updown', stroke = ink): 
   return shapes
 }
 
-function num(n: number): CellShape[] {
-  return [box(), { kind: 'text', x: 40, y: 48, value: String(n), fill: ink }]
-}
-
 function tile(positions: number[], fill = teal): CellShape[] {
   // 3x3 mini grid positions 0-8
   const shapes: CellShape[] = [box()]
@@ -115,6 +111,16 @@ function tile(positions: number[], fill = teal): CellShape[] {
     })
   }
   return shapes
+}
+
+function shapeMark(type: 'circle' | 'triangle' | 'square', fill = 'none', stroke = ink): CellShape[] {
+  if (type === 'circle') {
+    return cell(box(), { kind: 'circle', cx: 40, cy: 40, r: 17, fill, stroke })
+  }
+  if (type === 'triangle') {
+    return cell(box(), { kind: 'poly', points: '40,18 62,62 18,62', fill, stroke })
+  }
+  return cell(box(), { kind: 'rect', x: 23, y: 23, w: 34, h: 34, fill, stroke })
 }
 
 function ring(count: number, filled = false): CellShape[] {
@@ -320,12 +326,22 @@ export const QUESTIONS: Question[] = [
     answer: 0,
     difficulty: 1,
   },
-  // 8 — number sequence row sums logic: each row 1,2,3 then 2,3,4 then 3,4,5
+  // 8 — ring fill and growth shift
   {
     id: 8,
     prompt: 'Which option completes the pattern?',
-    matrix: [num(1), num(2), num(3), num(2), num(3), num(4), num(3), num(4), null],
-    options: [num(5), num(4), num(6), num(3), num(1), num(2)],
+    matrix: [
+      ring(1),
+      ring(1, true),
+      ring(2),
+      ring(1, true),
+      ring(2),
+      ring(2, true),
+      ring(2),
+      ring(2, true),
+      null,
+    ],
+    options: [ring(3), ring(1), ring(2), ring(3, true), circleAt(40, 40, 16, ink), diag('both')],
     answer: 0,
     difficulty: 1,
   },
@@ -537,12 +553,29 @@ export const QUESTIONS: Question[] = [
     answer: 0,
     difficulty: 2,
   },
-  // 17 — numbers: each column subtracts
+  // 17 — paired arcs rotate by column
   {
     id: 17,
     prompt: 'Which option completes the pattern?',
-    matrix: [num(9), num(6), num(3), num(8), num(5), num(2), num(7), num(4), null],
-    options: [num(1), num(0), num(2), num(3), num(5), num(6)],
+    matrix: [
+      cell(box(), { kind: 'arc', d: 'M20 50 Q40 15 60 50', stroke: ink, fill: 'none' }),
+      cell(box(), { kind: 'arc', d: 'M50 20 Q15 40 50 60', stroke: ink, fill: 'none' }),
+      cell(box(), { kind: 'arc', d: 'M20 30 Q40 65 60 30', stroke: ink, fill: 'none' }),
+      cell(box(), { kind: 'arc', d: 'M50 20 Q15 40 50 60', stroke: ink, fill: 'none' }),
+      cell(box(), { kind: 'arc', d: 'M20 30 Q40 65 60 30', stroke: ink, fill: 'none' }),
+      cell(box(), { kind: 'arc', d: 'M30 20 Q65 40 30 60', stroke: ink, fill: 'none' }),
+      cell(box(), { kind: 'arc', d: 'M20 30 Q40 65 60 30', stroke: ink, fill: 'none' }),
+      cell(box(), { kind: 'arc', d: 'M30 20 Q65 40 30 60', stroke: ink, fill: 'none' }),
+      null,
+    ],
+    options: [
+      cell(box(), { kind: 'arc', d: 'M20 50 Q40 15 60 50', stroke: ink, fill: 'none' }),
+      cell(box(), { kind: 'arc', d: 'M50 20 Q15 40 50 60', stroke: ink, fill: 'none' }),
+      cell(box(), { kind: 'arc', d: 'M30 20 Q65 40 30 60', stroke: ink, fill: 'none' }),
+      diag('both'),
+      ring(2),
+      arrow('right'),
+    ],
     answer: 0,
     difficulty: 2,
   },
@@ -646,17 +679,34 @@ export const QUESTIONS: Question[] = [
       ring(1, true),
       circleAt(40, 40, 18, ink),
       diag('both'),
-      num(3),
+      tile([0, 4, 8]),
     ],
     answer: 0,
     difficulty: 3,
   },
-  // 22 — number product / relation: 2,3,6 / 3,4,12 / 4,5,?
+  // 22 — combine the first two cells into the third
   {
     id: 22,
     prompt: 'Which option completes the pattern?',
-    matrix: [num(2), num(3), num(6), num(3), num(4), num(12), num(4), num(5), null],
-    options: [num(20), num(9), num(15), num(10), num(8), num(25)],
+    matrix: [
+      hLines(1),
+      vLines(1),
+      cell(...hLines(1), ...vLines(1).slice(1)),
+      diag('tl'),
+      diag('tr'),
+      diag('both'),
+      arrow('up'),
+      arrow('down'),
+      null,
+    ],
+    options: [
+      arrow('updown'),
+      arrow('up'),
+      arrow('down'),
+      diag('both'),
+      cell(...hLines(1), ...vLines(1).slice(1)),
+      ring(2),
+    ],
     answer: 0,
     difficulty: 3,
   },
@@ -764,12 +814,29 @@ export const QUESTIONS: Question[] = [
     answer: 0,
     difficulty: 3,
   },
-  // 27 — dual rule numbers
+  // 27 — shape and fill grid
   {
     id: 27,
     prompt: 'Which option completes the pattern?',
-    matrix: [num(1), num(4), num(2), num(2), num(5), num(3), num(3), num(6), null],
-    options: [num(4), num(5), num(7), num(9), num(1), num(8)],
+    matrix: [
+      shapeMark('circle'),
+      shapeMark('triangle'),
+      shapeMark('square'),
+      shapeMark('circle', ink),
+      shapeMark('triangle', ink),
+      shapeMark('square', ink),
+      shapeMark('circle', teal, teal),
+      shapeMark('triangle', teal, teal),
+      null,
+    ],
+    options: [
+      shapeMark('square', teal, teal),
+      shapeMark('circle', teal, teal),
+      shapeMark('triangle', teal, teal),
+      shapeMark('square', ink),
+      ring(2),
+      tile([0, 4, 8]),
+    ],
     answer: 0,
     difficulty: 3,
   },
@@ -832,21 +899,21 @@ export const QUESTIONS: Question[] = [
     matrix: [
       tile([0, 4, 8], teal),
       suit('diamond', false),
-      num(3),
+      ring(1),
       suit('diamond', true),
-      num(4),
+      ring(2),
       tile([2, 4, 6], amber),
-      num(5),
+      ring(3),
       tile([1, 4, 7], teal),
       null,
     ],
     options: [
       suit('diamond', false),
       suit('heart', true),
-      num(6),
       tile([0, 4, 8], amber),
       ring(3, true),
       arrow('updown'),
+      shapeMark('square', teal, teal),
     ],
     answer: 0,
     difficulty: 3,

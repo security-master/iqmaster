@@ -1,5 +1,5 @@
 import { createSecurityCode, createTestId } from './id'
-import { scoreAnswers, type Gender, type ScoreResult } from './iq'
+import { scoreAnswers, type CompletionMode, type Gender, type ScoreResult } from './iq'
 import { QUESTIONS, countCorrect } from '../data/questions'
 
 export interface TestSession {
@@ -7,6 +7,7 @@ export interface TestSession {
   securityCode: string
   createdAt: string
   answers: Array<number | null>
+  answeredCount: number
   startedAt: string
   finishedAt?: string
   elapsedSeconds: number
@@ -15,6 +16,7 @@ export interface TestSession {
     age: number
     gender: Gender
   }
+  completionMode?: CompletionMode
   paid: boolean
   result?: ScoreResult
 }
@@ -41,6 +43,7 @@ export function createSession(): TestSession {
     securityCode: createSecurityCode(),
     createdAt: new Date().toISOString(),
     answers: Array.from({ length: QUESTIONS.length }, () => null),
+    answeredCount: 0,
     startedAt: new Date().toISOString(),
     elapsedSeconds: 0,
     paid: false,
@@ -66,6 +69,7 @@ export function setAnswer(testId: string, index: number, option: number) {
   const session = getSession(testId)
   if (!session) return null
   session.answers[index] = option
+  session.answeredCount = countAnswered(session.answers)
   saveSession(session)
   return session
 }
@@ -78,16 +82,38 @@ export function updateElapsed(testId: string, seconds: number) {
   return session
 }
 
+export function countAnswered(answers: Array<number | null>): number {
+  return answers.filter((answer) => answer !== null).length
+}
+
+function completionModeFor(answeredCount: number): CompletionMode {
+  return answeredCount >= QUESTIONS.length ? 'full' : 'early'
+}
+
+export function finishSession(testId: string) {
+  const session = getSession(testId)
+  if (!session) return null
+  const answeredCount = countAnswered(session.answers)
+  session.answeredCount = answeredCount
+  session.completionMode = completionModeFor(answeredCount)
+  session.finishedAt = session.finishedAt ?? new Date().toISOString()
+  saveSession(session)
+  return session
+}
+
 export function completeProfile(
   testId: string,
   profile: { name: string; age: number; gender: Gender },
 ) {
   const session = getSession(testId)
   if (!session) return null
+  const answeredCount = countAnswered(session.answers)
   session.profile = profile
-  session.finishedAt = new Date().toISOString()
+  session.answeredCount = answeredCount
+  session.completionMode = completionModeFor(answeredCount)
+  session.finishedAt = session.finishedAt ?? new Date().toISOString()
   const correct = countCorrect(session.answers)
-  session.result = scoreAnswers(correct, QUESTIONS.length, profile.age)
+  session.result = scoreAnswers(correct, answeredCount, profile.age, QUESTIONS.length)
   saveSession(session)
   return session
 }

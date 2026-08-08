@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { CellSvg, MatrixSvg } from '../components/PuzzleSvg'
 import { QUESTIONS } from '../data/questions'
-import { formatElapsed, getSession, setAnswer, updateElapsed } from '../lib/session'
+import { countAnswered, finishSession, formatElapsed, getSession, setAnswer, updateElapsed } from '../lib/session'
 
 export function TestQuestion() {
   const { testId = '', number = '1' } = useParams()
@@ -24,6 +24,7 @@ export function TestQuestion() {
         const next = prev + 1
         updateElapsed(testId, next)
         if (next >= 60 * 60) {
+          finishSession(testId)
           navigate(`/iq-test/${testId}/complete`)
         }
         return next
@@ -42,7 +43,23 @@ export function TestQuestion() {
     setAnswer(testId, index, option)
   }
 
+  function finishNow() {
+    const latestSession = getSession(testId) ?? session
+    const currentAnsweredCount = countAnswered(latestSession.answers)
+    if (
+      currentAnsweredCount < 8 &&
+      !window.confirm(
+        `You have answered ${currentAnsweredCount} of ${QUESTIONS.length} items. Finish now with a low-confidence provisional score?`,
+      )
+    ) {
+      return
+    }
+    finishSession(testId)
+    navigate(`/iq-test/${testId}/complete`)
+  }
+
   const isLast = index === QUESTIONS.length - 1
+  const answeredCount = countAnswered(session.answers)
 
   return (
     <div className="container test-shell">
@@ -54,6 +71,11 @@ export function TestQuestion() {
           Question {index + 1}/{QUESTIONS.length}
         </div>
         <div aria-live="polite">{formatElapsed(elapsed)}</div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '1rem 0' }}>
+        <button type="button" className="btn btn-primary" onClick={finishNow}>
+          Finish test now
+        </button>
       </div>
 
       <div className="test-panel">
@@ -102,14 +124,13 @@ export function TestQuestion() {
               →
             </button>
           ) : (
-            <Link to={`/iq-test/${testId}/complete`} className="btn btn-primary" style={{ marginLeft: '0.5rem' }}>
+            <button type="button" className="btn btn-primary" style={{ marginLeft: '0.5rem' }} onClick={finishNow}>
               Finish
-            </Link>
+            </button>
           )}
         </div>
         <p className="muted" style={{ marginTop: '0.85rem', fontSize: '0.92rem' }}>
-          Answered {session.answers.filter((a) => a != null).length} of {QUESTIONS.length} — you can
-          revisit any item before finishing.
+          Answered {answeredCount} of {QUESTIONS.length} — you can revisit any item before finishing.
         </p>
       </div>
     </div>
