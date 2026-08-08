@@ -51,7 +51,7 @@ export function Header() {
           className="menu-toggle"
           type="button"
           aria-expanded={open}
-          aria-label="Toggle menu"
+          aria-label={t('nav.menu')}
           onClick={() => setOpen((v) => !v)}
         >
           {open ? t('nav.close') : t('nav.menu')}

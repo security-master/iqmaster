@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -51,6 +52,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       /* ignore storage errors */
     }
   }, [])
+
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
 
   const t = useCallback(
     (key: string) => getNested(messages[lang], key) ?? getNested(messages.en, key) ?? key,
