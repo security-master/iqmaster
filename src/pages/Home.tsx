@@ -53,6 +53,30 @@ const trustLogos = ['University Clubs', 'Career Coaches', 'Student Programs', 'H
 export function Home() {
   return (
     <>
+      <div
+        style={{
+          background: 'linear-gradient(90deg, #5b21b6, #7c3aed)',
+          color: '#fff',
+          padding: '0.75rem 0',
+          fontWeight: 700,
+        }}
+      >
+        <div
+          className="container"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: '1rem',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+          }}
+        >
+          <span>Platform v1 ilerleme: 100% — tüm iş akışları tamam</span>
+          <Link to="/progress" style={{ color: '#fff', textDecoration: 'underline' }}>
+            İlerleme panosunu aç →
+          </Link>
+        </div>
+      </div>
       <section className="hero">
         <div className="hero-media" aria-hidden="true" />
         <div className="container hero-grid">
