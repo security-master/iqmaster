@@ -17,7 +17,7 @@ export function Header() {
           <span className="brand-mark">IQ</span>
           <span>
             IQMaster
-            <small>Certificate IQ Test</small>
+            <small>Private Assessment</small>
           </span>
         </Link>
 

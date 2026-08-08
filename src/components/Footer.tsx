@@ -7,8 +7,8 @@ export function Footer() {
         <div>
           <div className="footer-brand">IQMaster</div>
           <p>
-            A refined online IQ assessment with a clear score report, percentile context, and
-            printable certificate — built for personal insight and professional use.
+            A private, culture-fair IQ assessment with a precise score, refined report, and
+            printable certificate—for individuals and organizations who expect finish quality.
           </p>
         </div>
         <div className="footer-col">

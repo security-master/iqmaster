@@ -4,52 +4,52 @@ import { useI18n } from '../i18n/I18nContext'
 import { asset } from '../lib/asset'
 
 const abilities = [
-  ['Memory Retrieval', 'Store, compare, and retrieve patterns while solving each visual item.'],
-  ['Attention and Concentration', 'Stay focused as shapes, spacing, and rules shift from question to question.'],
-  ['Processing Speed', 'Work through a clean, timed flow that rewards accurate visual scanning.'],
-  ['Inductive Reasoning', 'Find the hidden rule in each matrix and choose the missing answer.'],
-  ['Quantitative Reasoning', 'Recognize proportional and sequence logic without trivia or long reading.'],
-  ['Visual Processing', 'Evaluate rotation, symmetry, progression, and figure-ground relationships.'],
+  ['Memory Retrieval', 'Hold, compare, and recall patterns across each visual item.'],
+  ['Attention', 'Stay precise as spacing, shape, and rules shift from item to item.'],
+  ['Processing Speed', 'A timed, uncluttered flow that rewards accurate scanning.'],
+  ['Inductive Reasoning', 'Detect the hidden rule in each matrix and complete it.'],
+  ['Quantitative Logic', 'Proportion and sequence without trivia or long reading.'],
+  ['Visual Processing', 'Rotation, symmetry, progression, and figure–ground judgment.'],
 ]
 
 const steps = [
   {
     number: '01',
-    title: 'Start Intelligence Test',
-    text: 'Begin with a focused 30-question assessment designed around culture-fair matrix reasoning.',
+    title: 'Begin the assessment',
+    text: 'Thirty culture-fair matrix items. One focused sitting, no distractions.',
   },
   {
     number: '02',
-    title: 'Process',
-    text: 'Answer one visual problem at a time, review your progress, and complete the test in one sitting.',
+    title: 'Complete with care',
+    text: 'Work through each problem at your pace within the session window.',
   },
   {
     number: '03',
-    title: 'Completion',
-    text: 'Unlock your IQ score, percentile, report, and printable IQMaster certificate immediately.',
+    title: 'Unlock your dossier',
+    text: 'Score, percentile, ability profile, PDF report, and printable certificate.',
   },
 ]
 
 const testimonials = [
   {
     quote:
-      'The questions felt challenging without being confusing. The report made my score and percentile easy to understand.',
+      'Challenging without being gimmicky. The report explained my score with the clarity I expected from a paid assessment.',
     name: 'Sandra Bennett',
-    location: 'Canada',
+    location: 'Toronto',
     photo: asset('/images/avatar-sandra.jpg'),
   },
   {
     quote:
-      'A clean way to test yourself online. I liked that the certificate and pricing were clear before I started.',
+      'Transparent pricing and a certificate worth keeping. Feels closer to a private evaluation than a viral quiz.',
     name: 'George H. Lewis',
-    location: 'United States',
+    location: 'New York',
     photo: asset('/images/avatar-george.jpg'),
   },
   {
     quote:
-      'Fast, polished, and more informative than the old IQ test sites I remembered from years ago.',
+      'Quiet, polished, and decisive. I finished knowing exactly what my score meant—and how to share it.',
     name: 'Jordan Stevenson',
-    location: 'United Kingdom',
+    location: 'London',
     photo: asset('/images/avatar-jordan.jpg'),
   },
 ]
@@ -60,10 +60,11 @@ export function Home() {
   return (
     <>
       <Seo
-        title="IQMaster — Online IQ Test & Certificate"
-        description="Take a culture-fair 30-question IQ test online. Get your score, percentile, analysis, and printable certificate with transparent pricing."
+        title="IQMaster — Private Online IQ Assessment & Certificate"
+        description="A refined, culture-fair IQ assessment for discerning adults. Clear score, percentile, PDF report, and printable certificate."
       />
-      <section className="hero hero--photo">
+
+      <section className="hero hero--photo hero--atelier">
         <div className="hero-media" aria-hidden="true">
           <img
             className="hero-photo"
@@ -75,14 +76,16 @@ export function Home() {
           />
         </div>
         <div className="container hero-content hero-content--photo">
-          <p className="hero-brand">{t('home.hero.brand')}</p>
+          <p className="hero-brand">
+            <span>{t('home.hero.brand')}</span>
+          </p>
           <h1 className="hero-title">{t('home.hero.title')}</h1>
           <p className="hero-copy">{t('home.hero.lead')}</p>
           <div className="hero-actions">
             <Link to="/iq-test" className="btn btn-primary">
               {t('home.hero.ctaPrimary')}
             </Link>
-            <Link to="/age-groups" className="btn btn-secondary">
+            <Link to="/sample-certificate" className="hero-text-link">
               {t('home.hero.ctaSecondary')}
             </Link>
           </div>
@@ -92,7 +95,7 @@ export function Home() {
 
       <section className="section people-section">
         <div className="container people-split">
-          <figure className="people-figure">
+          <figure className="people-figure people-figure--atelier">
             <img
               className="img-faces"
               src={asset('/images/cta-people.jpg')}
@@ -101,12 +104,12 @@ export function Home() {
               height={1067}
             />
           </figure>
-          <div>
-            <p className="eyebrow">Trusted by professionals</p>
-            <h2 className="section-title">Built for people who want clarity</h2>
+          <div className="section-copy">
+            <p className="eyebrow">Private assessment</p>
+            <h2 className="section-title">Crafted for people who pay for clarity</h2>
             <p className="section-lead">
-              Individuals, coaches, teachers, and HR teams use IQMaster for a fast visual assessment
-              and a report they can actually use.
+              IQMaster is built for adults and organizations who want a serious visual score—not a
+              novelty quiz. Quiet design. Transparent unlock. A certificate you can stand behind.
             </p>
             <div className="hero-actions">
               <Link to="/packages" className="btn btn-primary">
@@ -120,21 +123,20 @@ export function Home() {
         </div>
       </section>
 
-      <section className="section assessment-section">
+      <section className="section assessment-section assessment-section--atelier">
         <div className="container">
           <div className="section-heading centered">
-            <p className="eyebrow">IQMaster — Test Your IQ</p>
-            <h2 className="section-title">Put your mind to the test</h2>
+            <p className="eyebrow">Measured dimensions</p>
+            <h2 className="section-title">Six abilities. One precise score.</h2>
             <p className="section-lead">
-              IQMaster is designed to help people learn more about human intelligence through a
-              structured, visual reasoning assessment.
+              Each item probes culture-fair matrix reasoning—so results reflect thinking, not trivia.
             </p>
           </div>
-          <div className="ability-grid">
-            {abilities.map(([title, text]) => (
-              <article className="ability assessment-card" key={title}>
-                <span className="ability-icon" aria-hidden="true">
-                  +
+          <div className="ability-grid ability-grid--atelier">
+            {abilities.map(([title, text], index) => (
+              <article className="ability assessment-card assessment-card--atelier" key={title}>
+                <span className="ability-index" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
                 </span>
                 <h3>{title}</h3>
                 <p>{text}</p>
@@ -146,15 +148,23 @@ export function Home() {
 
       <section className="section trust-section">
         <div className="container people-split people-split--reverse">
-          <div>
-            <p className="eyebrow">100% Reliable IQ Test</p>
-            <h2 className="section-title">Trusted by learners and teams</h2>
+          <div className="section-copy">
+            <p className="eyebrow">Results you can use</p>
+            <h2 className="section-title">A report and certificate with presence</h2>
             <p className="section-lead">
-              A professional certificate funnel, transparent pricing, and clear result pages make
-              IQMaster easy to use for personal development, study groups, and coaching contexts.
+              Unlock a clear IQ score, percentile context, ability profile, and a printable
+              IQMaster certificate—designed to look deliberate on paper and on screen.
             </p>
+            <div className="hero-actions">
+              <Link to="/sample-report" className="btn btn-secondary">
+                View sample report
+              </Link>
+              <Link to="/sample-certificate" className="btn btn-secondary">
+                View sample certificate
+              </Link>
+            </div>
           </div>
-          <figure className="people-figure">
+          <figure className="people-figure people-figure--atelier">
             <img
               className="img-faces"
               src={asset('/images/section-study.jpg')}
@@ -166,15 +176,15 @@ export function Home() {
         </div>
       </section>
 
-      <section className="section testimonial-section">
+      <section className="section testimonial-section testimonial-section--atelier">
         <div className="container">
           <div className="section-heading centered">
-            <p className="eyebrow">Reviews</p>
-            <h2 className="section-title">What test takers say</h2>
+            <p className="eyebrow">From recent assessments</p>
+            <h2 className="section-title">What discerning test takers notice</h2>
           </div>
-          <div className="testimonial-grid">
+          <div className="testimonial-grid testimonial-grid--atelier">
             {testimonials.map((item) => (
-              <article className="testimonial-card testimonial-card--photo" key={item.name}>
+              <article className="testimonial-card testimonial-card--atelier" key={item.name}>
                 <p>&ldquo;{item.quote}&rdquo;</p>
                 <div className="testimonial-person">
                   <img src={item.photo} alt="" width={56} height={56} />
@@ -191,7 +201,7 @@ export function Home() {
 
       <section className="section how-section" id="how-it-works">
         <div className="container people-split">
-          <figure className="people-figure">
+          <figure className="people-figure people-figure--atelier">
             <img
               className="img-desk"
               src={asset('/images/section-coach.jpg')}
@@ -200,19 +210,21 @@ export function Home() {
               height={1067}
             />
           </figure>
-          <div>
-            <p className="eyebrow">How It Works</p>
-            <h2 className="section-title">How IQMaster works</h2>
+          <div className="section-copy">
+            <p className="eyebrow">The path</p>
+            <h2 className="section-title">Three steps. No theatre.</h2>
             <p className="section-lead">
-              An IQ test assesses cognitive abilities and provides a score meant to reflect
-              intellectual potential and problem-solving ability.
+              A composed experience from first question to unlocked dossier—built for people who
+              value finish quality as much as the score itself.
             </p>
-            <div className="steps steps--stacked">
+            <div className="steps steps--stacked steps--atelier">
               {steps.map((step) => (
-                <article className="step" key={step.number}>
+                <article className="step step--atelier" key={step.number}>
                   <span>{step.number}</span>
-                  <h3>{step.title}</h3>
-                  <p>{step.text}</p>
+                  <div>
+                    <h3>{step.title}</h3>
+                    <p>{step.text}</p>
+                  </div>
                 </article>
               ))}
             </div>
@@ -222,7 +234,7 @@ export function Home() {
 
       <section className="section final-cta-section">
         <div className="container">
-          <div className="cta-band cta-band--photo">
+          <div className="cta-band cta-band--photo cta-band--atelier">
             <img
               className="cta-band__photo"
               src={asset('/images/hero-portrait.jpg')}
@@ -232,12 +244,12 @@ export function Home() {
               aria-hidden="true"
             />
             <div className="cta-band__content">
-              <p className="eyebrow">Ready to get started?</p>
-              <h2>Start right now with IQMaster</h2>
-              <p>One of the clearest online solutions for finding your IQ score and certificate.</p>
+              <p className="eyebrow">Begin when ready</p>
+              <h2>Reserve your score with IQMaster</h2>
+              <p>A private, culture-fair assessment with a certificate worth the unlock.</p>
             </div>
             <Link to="/iq-test" className="btn btn-primary inverse">
-              Start IQ Test Now
+              Start the assessment
             </Link>
           </div>
         </div>
