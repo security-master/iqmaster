@@ -133,13 +133,13 @@ p {
 }
 
 .btn-primary {
-  background: var(--primary);
+  background: #c9a76a !important;
   color: #12151c !important;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
 }
 
 .btn-primary:hover {
-  background: var(--primary-2);
+  background: #d8b97f !important;
   color: #12151c !important;
 }
 
@@ -327,11 +327,15 @@ p {
 }
 
 .lang-flag {
-  width: 18px;
-  height: 12px;
-  border-radius: 2px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+  width: 22px;
+  height: 15px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
   flex-shrink: 0;
+}
+
+.brand-text strong {
+  color: #fff;
 }
 
 .menu-toggle {
@@ -941,18 +945,18 @@ p {
 }
 
 .btn-primary {
-  background: var(--primary);
+  background: #c9a76a !important;
   color: #12151c !important;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
 }
 
 .btn-primary:hover {
-  background: var(--primary-2);
+  background: #d8b97f !important;
   color: #12151c !important;
 }
 
 .btn-primary.inverse {
-  background: #f3f5f8;
+  background: #f3f5f8 !important;
   color: #12151c !important;
   box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
 }
@@ -1103,7 +1107,7 @@ p {
 }
 
 .hero-content--photo .hero-copy {
-  color: var(--slate);
+  color: #d7dde8;
   max-width: 40ch;
   animation: fadeUp 0.85s ease 0.12s both;
 }
@@ -2057,7 +2061,7 @@ p {
   font-size: clamp(1.02rem, 1.7vw, 1.15rem);
   line-height: 1.7;
   max-width: 38ch;
-  color: var(--slate);
+  color: #d7dde8;
 }
 
 .hero-text-link {
