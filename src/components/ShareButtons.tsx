@@ -1,26 +1,32 @@
 import { useState } from 'react'
+import { renderCertificatePng, type CertificateDetails } from '../lib/report/certificate'
 import {
   canUseNativeShare,
   copyShareLink,
   getShareLinks,
+  openWhatsAppShare,
   shareResult,
   type NativeShareStatus,
   type ShareDetails,
 } from '../lib/report/share'
 import { SocialIcon } from './SocialIcons'
 
-export type ShareButtonsProps = ShareDetails
+export type ShareButtonsProps = ShareDetails & {
+  certificate?: CertificateDetails
+}
 
 function getStatusMessage(status: NativeShareStatus | 'idle'): string {
   switch (status) {
     case 'shared':
       return 'Share sheet opened.'
+    case 'whatsapp':
+      return 'Opening WhatsApp…'
     case 'dismissed':
       return 'Share cancelled.'
     case 'unavailable':
-      return 'Choose a network below to share in one tap.'
+      return 'Choose WhatsApp or another network below.'
     case 'copied':
-      return 'Result text and link copied.'
+      return 'Result text copied — paste anywhere.'
     default:
       return ''
   }
@@ -28,15 +34,25 @@ function getStatusMessage(status: NativeShareStatus | 'idle'): string {
 
 export function ShareButtons(props: ShareButtonsProps) {
   const [status, setStatus] = useState<NativeShareStatus | 'idle'>('idle')
-  const links = getShareLinks(props)
+  const { certificate, ...shareDetails } = props
+  const links = getShareLinks(shareDetails)
   const hasNativeShare = canUseNativeShare()
 
+  function onWhatsApp() {
+    setStatus('whatsapp')
+    openWhatsAppShare(shareDetails)
+  }
+
   async function onNativeShare() {
-    setStatus(await shareResult(props))
+    let file: Blob | null = null
+    if (certificate && (certificate.answered ?? 1) > 0) {
+      file = await renderCertificatePng(certificate)
+    }
+    setStatus(await shareResult(shareDetails, file))
   }
 
   async function onCopy() {
-    const ok = await copyShareLink(props)
+    const ok = await copyShareLink(shareDetails)
     setStatus(ok ? 'copied' : 'unavailable')
   }
 
@@ -45,30 +61,59 @@ export function ShareButtons(props: ShareButtonsProps) {
       <div className="share-panel__head">
         <p className="eyebrow">One-tap social share</p>
         <h3>Share your result</h3>
-        <p>Post to the network you already use—icons cover a wide set of platforms.</p>
+        <p>Send your score directly — WhatsApp opens with a ready-to-send message.</p>
       </div>
 
-      {hasNativeShare && (
-        <button className="btn btn-primary share-native" type="button" onClick={onNativeShare}>
-          Share via device
+      <div className="share-featured">
+        <button
+          className="btn share-whatsapp-btn"
+          type="button"
+          onClick={onWhatsApp}
+          aria-label="Share directly on WhatsApp"
+        >
+          <SocialIcon platform="whatsapp" className="share-icon" />
+          Share on WhatsApp
         </button>
-      )}
+        {hasNativeShare && (
+          <button className="btn btn-secondary" type="button" onClick={() => void onNativeShare()}>
+            Share via device
+          </button>
+        )}
+      </div>
 
       <div className="share-grid">
-        {links.map((link) =>
-          link.action === 'copy' ? (
-            <button
-              key={link.platform}
-              type="button"
-              className={`share-icon-btn share-icon-btn--${link.platform}`}
-              aria-label={link.ariaLabel}
-              title={link.label}
-              onClick={onCopy}
-            >
-              <SocialIcon platform={link.platform} className="share-icon" />
-              <span>{link.label}</span>
-            </button>
-          ) : (
+        {links.map((link) => {
+          if (link.action === 'whatsapp') {
+            return (
+              <button
+                key={link.platform}
+                type="button"
+                className={`share-icon-btn share-icon-btn--${link.platform}`}
+                aria-label={link.ariaLabel}
+                title={link.label}
+                onClick={onWhatsApp}
+              >
+                <SocialIcon platform={link.platform} className="share-icon" />
+                <span>{link.label}</span>
+              </button>
+            )
+          }
+          if (link.action === 'copy') {
+            return (
+              <button
+                key={link.platform}
+                type="button"
+                className={`share-icon-btn share-icon-btn--${link.platform}`}
+                aria-label={link.ariaLabel}
+                title={link.label}
+                onClick={() => void onCopy()}
+              >
+                <SocialIcon platform={link.platform} className="share-icon" />
+                <span>{link.label}</span>
+              </button>
+            )
+          }
+          return (
             <a
               key={link.platform}
               className={`share-icon-btn share-icon-btn--${link.platform}`}
@@ -81,8 +126,8 @@ export function ShareButtons(props: ShareButtonsProps) {
               <SocialIcon platform={link.platform} className="share-icon" />
               <span>{link.label}</span>
             </a>
-          ),
-        )}
+          )
+        })}
       </div>
 
       <p className="share-status" aria-live="polite">

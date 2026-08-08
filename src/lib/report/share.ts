@@ -1,9 +1,11 @@
+import { cleanBandLabel } from '../iq'
+
 export type SharePlatform =
+  | 'whatsapp'
   | 'x'
   | 'linkedin'
   | 'facebook'
   | 'messenger'
-  | 'whatsapp'
   | 'telegram'
   | 'reddit'
   | 'threads'
@@ -20,6 +22,9 @@ export interface ShareDetails {
   band: string
   percentile: number
   testId: string
+  countryName?: string
+  delta?: number
+  lang?: 'en' | 'tr'
 }
 
 export interface ShareLink {
@@ -27,10 +32,10 @@ export interface ShareLink {
   label: string
   ariaLabel: string
   url: string
-  action?: 'copy'
+  action?: 'copy' | 'whatsapp'
 }
 
-export type NativeShareStatus = 'shared' | 'dismissed' | 'unavailable' | 'copied'
+export type NativeShareStatus = 'shared' | 'dismissed' | 'unavailable' | 'copied' | 'whatsapp'
 
 const SHARE_TITLE = 'My IQMaster result'
 
@@ -38,19 +43,55 @@ function encode(value: string): string {
   return encodeURIComponent(value)
 }
 
-export function buildShareText(details: Pick<ShareDetails, 'iq' | 'band' | 'percentile'>): string {
-  return `I scored IQ ${details.iq} on IQMaster (${details.band}, ${details.percentile}th percentile).`
+export function getPublicSiteUrl(): string {
+  if (typeof window === 'undefined') return 'https://security-master.github.io/iqmaster/'
+  const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
+  return `${window.location.origin}${base || ''}/`
 }
 
+/** Prefer a public landing URL — private results links are not viewable by others. */
 export function getShareUrl(): string {
-  if (typeof window === 'undefined') return ''
+  return getPublicSiteUrl()
+}
 
-  const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
-  const origin = window.location.origin
-  if (window.location.pathname.includes('/iq-test/') && window.location.pathname.includes('/results')) {
-    return window.location.href.split('?')[0]
+export function buildShareText(details: ShareDetails): string {
+  const band = cleanBandLabel(details.band)
+  const countryBit =
+    details.countryName != null && details.delta != null
+      ? details.lang === 'tr'
+        ? ` · ${details.countryName}: ${details.delta >= 0 ? '+' : ''}${details.delta}`
+        : ` · ${details.countryName}: ${details.delta >= 0 ? '+' : ''}${details.delta}`
+      : ''
+
+  if (details.lang === 'tr') {
+    return `IQMaster sonucum: IQ ${details.iq} (${band}, ${details.percentile}. yüzdelik)${countryBit}`
   }
-  return `${origin}${base || ''}/`
+  return `I scored IQ ${details.iq} on IQMaster (${band}, ${details.percentile}th percentile)${countryBit}`
+}
+
+export function buildWhatsAppShareText(details: ShareDetails): string {
+  const site = getShareUrl()
+  const body = buildShareText(details)
+  if (details.lang === 'tr') {
+    return `${body}\n\nSen de ölç: ${site}`
+  }
+  return `${body}\n\nTake yours: ${site}`
+}
+
+export function getWhatsAppShareUrl(details: ShareDetails): string {
+  const text = buildWhatsAppShareText(details)
+  // api.whatsapp.com works reliably on desktop + mobile browsers
+  return `https://api.whatsapp.com/send?text=${encode(text)}`
+}
+
+export function openWhatsAppShare(details: ShareDetails): boolean {
+  if (typeof window === 'undefined') return false
+  const url = getWhatsAppShareUrl(details)
+  const win = window.open(url, '_blank', 'noopener,noreferrer')
+  if (!win) {
+    window.location.href = url
+  }
+  return true
 }
 
 export function canUseNativeShare(): boolean {
@@ -60,17 +101,25 @@ export function canUseNativeShare(): boolean {
 export function getShareLinks(details: ShareDetails): ShareLink[] {
   const text = buildShareText(details)
   const shareUrl = getShareUrl()
+  const whatsappText = buildWhatsAppShareText(details)
   const encodedText = encode(text)
   const encodedUrl = encode(shareUrl)
-  const encodedCombined = encode(shareUrl ? `${text} ${shareUrl}` : text)
+  const encodedCombined = encode(`${text} ${shareUrl}`)
   const encodedTitle = encode(SHARE_TITLE)
 
   return [
     {
+      platform: 'whatsapp',
+      label: 'WhatsApp',
+      ariaLabel: 'Share directly on WhatsApp',
+      url: getWhatsAppShareUrl(details),
+      action: 'whatsapp',
+    },
+    {
       platform: 'x',
       label: 'X',
       ariaLabel: 'Share on X',
-      url: `https://twitter.com/intent/tweet?text=${encodedText}${shareUrl ? `&url=${encodedUrl}` : ''}`,
+      url: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
     },
     {
       platform: 'facebook',
@@ -91,12 +140,6 @@ export function getShareLinks(details: ShareDetails): ShareLink[] {
       url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
     },
     {
-      platform: 'whatsapp',
-      label: 'WhatsApp',
-      ariaLabel: 'Share on WhatsApp',
-      url: `https://wa.me/?text=${encodedCombined}`,
-    },
-    {
       platform: 'telegram',
       label: 'Telegram',
       ariaLabel: 'Share on Telegram',
@@ -112,7 +155,7 @@ export function getShareLinks(details: ShareDetails): ShareLink[] {
       platform: 'threads',
       label: 'Threads',
       ariaLabel: 'Share on Threads',
-      url: `https://www.threads.net/intent/post?text=${encodedCombined}`,
+      url: `https://www.threads.net/intent/post?text=${encode(whatsappText)}`,
     },
     {
       platform: 'pinterest',
@@ -146,8 +189,8 @@ export function getShareLinks(details: ShareDetails): ShareLink[] {
     },
     {
       platform: 'copy',
-      label: 'Copy link',
-      ariaLabel: 'Copy result link',
+      label: 'Copy text',
+      ariaLabel: 'Copy result text',
       url: shareUrl,
       action: 'copy',
     },
@@ -155,8 +198,7 @@ export function getShareLinks(details: ShareDetails): ShareLink[] {
 }
 
 export async function copyShareLink(details: ShareDetails): Promise<boolean> {
-  const url = getShareUrl()
-  const text = `${buildShareText(details)}${url ? ` ${url}` : ''}`
+  const text = buildWhatsAppShareText(details)
   try {
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(text)
@@ -168,15 +210,27 @@ export async function copyShareLink(details: ShareDetails): Promise<boolean> {
   return false
 }
 
-export async function shareResult(details: ShareDetails): Promise<NativeShareStatus> {
+export async function shareResult(
+  details: ShareDetails,
+  file?: Blob | null,
+): Promise<NativeShareStatus> {
   if (!canUseNativeShare()) return 'unavailable'
 
   try {
-    await navigator.share({
+    const data: ShareData = {
       title: SHARE_TITLE,
-      text: buildShareText(details),
-      url: getShareUrl() || undefined,
-    })
+      text: buildWhatsAppShareText(details),
+      url: getShareUrl(),
+    }
+    if (file && typeof navigator.canShare === 'function') {
+      const shareFile = new File([file], 'iqmaster-certificate.png', { type: 'image/png' })
+      const withFile = { ...data, files: [shareFile] }
+      if (navigator.canShare(withFile)) {
+        await navigator.share(withFile)
+        return 'shared'
+      }
+    }
+    await navigator.share(data)
     return 'shared'
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') return 'dismissed'

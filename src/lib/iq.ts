@@ -128,6 +128,16 @@ export function ordinal(n: number): string {
   }
 }
 
+/** Clean band for certificates/share — strip provisional wrappers. */
+export function cleanBandLabel(band: string): string {
+  const nested = band.match(/\(([^)]+)\)\s*$/)
+  if (nested?.[1]) return nested[1].trim()
+  return band
+    .replace(/^Provisional\s*\/\s*Low confidence\s*/i, '')
+    .replace(/^Provisional\s*/i, '')
+    .trim() || band
+}
+
 function evaluateIntegrity(
   answered: number,
   questionTotal: number,
@@ -212,53 +222,44 @@ function buildAbilityProfile(
   questionTotal: number,
   breakdown: DifficultyBreakdown[],
 ) {
+  const labels = [
+    ['Pattern recognition', 'Matrix rule detection across changing visual features.'],
+    ['Working attention', 'Sustained focus across item progression.'],
+    ['Processing consistency', 'Stability of responding under timed visual load.'],
+    ['Abstract reasoning', 'Multi-rule inference on advanced items without language dependence.'],
+    ['Visual discrimination', 'Fine discrimination of shape, spacing, and figure–ground relationships.'],
+    ['Adaptive problem solving', 'Ability to adjust strategy as item complexity increases.'],
+  ] as const
+
+  if (answered === 0) {
+    return labels.map(([label]) => ({
+      label,
+      score: 0,
+      note: 'Insufficient answered items to estimate this ability.',
+    }))
+  }
+
   const base = Math.round(clamp(accuracy * 100, 20, 99))
   const coverageBoost = Math.round(clamp((answered / Math.max(questionTotal, 1)) * 8, 0, 8))
   const easy = breakdown.find((b) => b.level === 1)
   const mid = breakdown.find((b) => b.level === 2)
   const hard = breakdown.find((b) => b.level === 3)
 
-  return [
-    {
-      label: 'Pattern recognition',
-      score: clamp(Math.round((mid?.accuracy || base) * 0.55 + base * 0.45), 20, 99),
-      note: 'Matrix rule detection across changing visual features.',
-    },
-    {
-      label: 'Working attention',
-      score: clamp(base - 1 + coverageBoost, 20, 99),
-      note: 'Sustained focus across item progression.',
-    },
-    {
-      label: 'Processing consistency',
-      score: clamp(
-        Math.round(((easy?.accuracy ?? base) + (mid?.accuracy ?? base)) / 2) -
-          (answered < questionTotal ? 6 : 0),
-        20,
-        99,
-      ),
-      note: 'Stability of responding under timed visual load.',
-    },
-    {
-      label: 'Abstract reasoning',
-      score: clamp(Math.round((hard?.accuracy || base * 0.85) * 0.7 + base * 0.3), 20, 99),
-      note: 'Multi-rule inference on advanced items without language dependence.',
-    },
-    {
-      label: 'Visual discrimination',
-      score: clamp(Math.round((easy?.accuracy ?? base) * 0.4 + base * 0.6), 20, 99),
-      note: 'Fine discrimination of shape, spacing, and figure–ground relationships.',
-    },
-    {
-      label: 'Adaptive problem solving',
-      score: clamp(
-        Math.round(base + ((hard?.accuracy ?? 0) > (mid?.accuracy ?? 0) ? 5 : -3)),
-        20,
-        99,
-      ),
-      note: 'Ability to adjust strategy as item complexity increases.',
-    },
+  const scores = [
+    clamp(Math.round((mid?.accuracy || base) * 0.55 + base * 0.45), 20, 99),
+    clamp(base - 1 + coverageBoost, 20, 99),
+    clamp(
+      Math.round(((easy?.accuracy ?? base) + (mid?.accuracy ?? base)) / 2) -
+        (answered < questionTotal ? 6 : 0),
+      20,
+      99,
+    ),
+    clamp(Math.round((hard?.accuracy || base * 0.85) * 0.7 + base * 0.3), 20, 99),
+    clamp(Math.round((easy?.accuracy ?? base) * 0.4 + base * 0.6), 20, 99),
+    clamp(Math.round(base + ((hard?.accuracy ?? 0) > (mid?.accuracy ?? 0) ? 5 : -3)), 20, 99),
   ]
+
+  return labels.map(([label, note], i) => ({ label, score: scores[i]!, note }))
 }
 
 function buildCountryComparison(iq: number, countryCode?: string): CountryComparison | undefined {
@@ -378,43 +379,53 @@ export function scoreAnswers(
   const integrityFactor = clamp(1 - integrity.speedPenalty - integrity.patternPenalty, 0.45, 1)
   const ageFactor = age < 16 ? -4 : age <= 30 ? 2 : age <= 45 ? 0 : age <= 60 ? -2 : -5
   const z = (accuracy - 0.55) / 0.18
+  // Never invent a "100 average" score for unanswered sessions.
   const iq = Math.round(
     clamp(
-      answered === 0 ? 100 : 100 + z * 15 * reliability * integrityFactor + ageFactor * reliability * integrityFactor,
+      answered === 0
+        ? 70
+        : 100 + z * 15 * reliability * integrityFactor + ageFactor * reliability * integrityFactor,
       70,
       155,
     ),
   )
-  const percentile = Math.round(clamp(normalCdf((iq - 100) / 15) * 100, 1, 99))
+  const percentile = answered === 0 ? 1 : Math.round(clamp(normalCdf((iq - 100) / 15) * 100, 1, 99))
   const band = BANDS.find((b) => iq >= b.min) ?? BANDS[BANDS.length - 1]
   const uncertainty =
-    confidence === 'low'
-      ? 'Estimated uncertainty: +/- 15 IQ points because fewer than 8 items were answered.'
-      : confidence === 'medium'
-        ? `Estimated uncertainty: +/- ${Math.round(clamp(10 - coverage * 4, 6, 9))} IQ points because the test was finished early.`
-        : integrity.flags.length
-          ? 'Estimated uncertainty: +/- 8 IQ points after integrity adjustments.'
-          : 'Estimated uncertainty: +/- 4 IQ points for this entertainment assessment.'
+    answered === 0
+      ? 'No scored estimate: zero items were answered. Retake and answer at least 8 items.'
+      : confidence === 'low'
+        ? 'Estimated uncertainty: +/- 15 IQ points because fewer than 8 items were answered.'
+        : confidence === 'medium'
+          ? `Estimated uncertainty: +/- ${Math.round(clamp(10 - coverage * 4, 6, 9))} IQ points because the test was finished early.`
+          : integrity.flags.length
+            ? 'Estimated uncertainty: +/- 8 IQ points after integrity adjustments.'
+            : 'Estimated uncertainty: +/- 4 IQ points for this entertainment assessment.'
   const confidenceNote =
-    confidence === 'low'
-      ? `Low confidence: only ${answered} of ${questionTotal} items were answered, so this is a provisional snapshot rather than a stable estimate.`
-      : confidence === 'medium'
-        ? `Moderate confidence: the estimate is based on ${answered} answered items and is scaled toward the average to reflect the unfinished portion.`
-        : `Standard confidence: all ${questionTotal} visual items were answered.`
+    answered === 0
+      ? `No confidence: 0 of ${questionTotal} items were answered. This session cannot support a published IQ estimate.`
+      : confidence === 'low'
+        ? `Low confidence: only ${answered} of ${questionTotal} items were answered, so this is a provisional snapshot rather than a stable estimate.`
+        : confidence === 'medium'
+          ? `Moderate confidence: the estimate is based on ${answered} answered items and is scaled toward the average to reflect the unfinished portion.`
+          : `Standard confidence: all ${questionTotal} visual items were answered.`
   const worldRankLabel =
-    confidence === 'low'
-      ? 'Provisional percentile context'
-      : percentile >= 98
-        ? 'Top 2% globally'
-        : percentile >= 90
-          ? 'Top 10% globally'
-          : percentile >= 75
-            ? 'Top quartile globally'
-            : percentile >= 50
-              ? 'Above the global midpoint'
-              : 'Building toward the global midpoint'
+    answered === 0
+      ? 'Not ranked — incomplete session'
+      : confidence === 'low'
+        ? 'Provisional percentile context'
+        : percentile >= 98
+          ? 'Top 2% globally'
+          : percentile >= 90
+            ? 'Top 10% globally'
+            : percentile >= 75
+              ? 'Top quartile globally'
+              : percentile >= 50
+                ? 'Above the global midpoint'
+                : 'Building toward the global midpoint'
 
-  const countryComparison = buildCountryComparison(iq, options.countryCode)
+  const countryComparison =
+    answered === 0 ? undefined : buildCountryComparison(iq, options.countryCode)
   const abilityProfile = buildAbilityProfile(accuracy, answered, questionTotal, difficultyBreakdown)
   const personalizedInsights = buildPersonalizedInsights(
     iq,
@@ -428,11 +439,18 @@ export function scoreAnswers(
   return {
     iq,
     percentile,
-    band: confidence === 'low' ? `Provisional / Low confidence (${band.label})` : band.label,
+    band:
+      answered === 0
+        ? 'Incomplete'
+        : confidence === 'low'
+          ? `Provisional / Low confidence (${band.label})`
+          : band.label,
     summary:
-      confidence === 'standard'
-        ? `${band.summary} ${integrity.flags.length ? integrity.note : ''}`.trim()
-        : `${band.summary} ${uncertainty}`,
+      answered === 0
+        ? 'This session has no answered items, so IQMaster cannot issue a reliable score or certificate claim.'
+        : confidence === 'standard'
+          ? `${band.summary} ${integrity.flags.length ? integrity.note : ''}`.trim()
+          : `${band.summary} ${uncertainty}`,
     correct,
     total: answered,
     answered,

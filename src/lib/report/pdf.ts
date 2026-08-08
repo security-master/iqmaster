@@ -1,4 +1,4 @@
-import { ordinal, type ScoreResult } from '../iq'
+import { cleanBandLabel, ordinal, type ScoreResult } from '../iq'
 
 export interface ReportDetails {
   name: string
@@ -68,13 +68,16 @@ export function getReportFilename(report: Pick<ReportDetails, 'name' | 'testId'>
 
 export function buildReportHtml(report: ReportDetails): string {
   const generatedAt = report.generatedAt ?? new Date()
+  const displayBand = cleanBandLabel(report.band)
   const safeName = escapeHtml(report.name)
-  const safeBand = escapeHtml(report.band)
+  const safeBand = escapeHtml(displayBand)
+  const safeFullBand = escapeHtml(report.band)
   const safeTestId = escapeHtml(report.testId)
   const safeDate = escapeHtml(formatDate(generatedAt))
   const safeTitle = escapeHtml(`${REPORT_TITLE} - ${report.name}`)
   const country = report.countryComparison
   const maxBar = Math.max(155, report.iq, country?.nationalAverage ?? 100)
+  const insufficient = (report.answered ?? 0) === 0
 
   const difficultyHtml = report.difficultyBreakdown?.length
     ? `<section class="card">
@@ -166,8 +169,8 @@ export function buildReportHtml(report: ReportDetails): string {
     .lede-sm { margin:10px 0 16px; }
     .score-panel { display:grid; grid-template-columns:0.9fr 1.1fr; gap:18px; margin:28px 0; }
     .card, .score-card, .detail-card { border:1px solid rgba(18,21,28,.1); border-radius:18px; padding:22px; background:#f8fafc; margin-bottom:16px; }
-    .score { margin:8px 0; color:#1a3f6d; font-size:84px; font-weight:900; letter-spacing:-.08em; line-height:.9; }
-    .band { font-size:24px; font-weight:800; letter-spacing:-.03em; color:#12151c; }
+    .score { display:block; margin:8px 0 12px; color:#1a3f6d; font-size:84px; font-weight:900; letter-spacing:-.08em; line-height:1; }
+    .band { display:block; margin-top:4px; font-size:22px; font-weight:800; letter-spacing:-.03em; color:#12151c; }
     .label { color:#6a7280; font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin-bottom:12px; }
     .detail-list { display:grid; gap:14px; margin-top:12px; }
     .detail-value { margin-top:2px; color:#12151c; font-size:18px; font-weight:800; }
@@ -187,25 +190,15 @@ export function buildReportHtml(report: ReportDetails): string {
     .chip.skip { background:#e5e7eb; color:#4b5563; }
     .legend { margin-top:10px; font-size:12px; color:#6a7280; }
     .note { margin-top:18px; padding:16px 18px; border-left:4px solid #c9a76a; border-radius:12px; background:#faf6ee; }
+    .warn { margin-top:18px; padding:16px 18px; border-left:4px solid #b45309; border-radius:12px; background:#fff7ed; color:#9a3412; }
     .footer { display:flex; justify-content:space-between; gap:12px; margin-top:28px; padding-top:16px; border-top:1px solid rgba(18,21,28,.1); color:#6a7280; font-size:12px; }
-    .certificate-page { min-height:980px; display:grid; place-items:center; background:
-      radial-gradient(circle at 20% 20%, rgba(201,167,106,.18), transparent 40%),
-      radial-gradient(circle at 80% 80%, rgba(26,63,109,.12), transparent 42%),
-      #fbf8f2; }
-    .certificate-shell { width:min(100%,720px); padding:48px 40px; border:1px solid rgba(201,167,106,.55); background:#fffefb; box-shadow:0 28px 70px rgba(18,21,28,.12); position:relative; text-align:center; }
-    .certificate-shell:before { content:""; position:absolute; inset:14px; border:1px solid rgba(26,63,109,.2); pointer-events:none; }
-    .certificate-shell .eyebrow { letter-spacing:.18em; text-transform:uppercase; color:#a18455; font-size:12px; font-weight:800; }
-    .certificate-shell h1 { font-family:Georgia,"Times New Roman",serif; font-size:40px; margin:12px 0 8px; }
-    .certificate-shell .score { color:#1a3f6d; font-size:72px; margin:18px 0 8px; }
-    .seal { width:84px; height:84px; margin:18px auto 0; border-radius:50%; border:2px solid #c9a76a; display:grid; place-items:center; color:#1a3f6d; font-weight:900; letter-spacing:.08em; font-size:12px; }
     @media (max-width:720px) {
       .score-panel, .grid3 { grid-template-columns:1fr; }
       .page { padding:24px; }
     }
     @media print {
       body { padding:0; background:#fff; }
-      .page { box-shadow:none; border:0; border-radius:0; page-break-after:always; }
-      .certificate-page { page-break-before:always; }
+      .page { box-shadow:none; border:0; border-radius:0; }
     }
   </style>
 </head>
@@ -216,13 +209,20 @@ export function buildReportHtml(report: ReportDetails): string {
       <div class="badge">Personalized dossier</div>
     </header>
     <h1>${safeName}'s cognitive assessment</h1>
-    <p class="lede">A personalized evaluation built from your exact answer pattern—not a generic template. Entertainment and education use only.</p>
+    <p class="lede">A personalized evaluation built from your exact answer pattern—not a generic template. Entertainment and education use only. Your premium certificate is a separate download.</p>
+
+    ${
+      insufficient
+        ? `<section class="warn"><p><strong>Incomplete session:</strong> No items were answered, so scores below are not publishable. Retake and answer at least 8 questions for a reliable estimate.</p></section>`
+        : ''
+    }
 
     <section class="score-panel">
       <div class="score-card">
         <div class="label">Estimated IQ</div>
         <div class="score">${report.iq}</div>
         <div class="band">${safeBand}</div>
+        ${report.band !== displayBand ? `<p style="margin-top:8px;color:#6a7280;font-size:13px">${safeFullBand}</p>` : ''}
       </div>
       <div class="detail-card">
         <div class="label">Result details</div>
@@ -254,32 +254,13 @@ export function buildReportHtml(report: ReportDetails): string {
     <section class="note">
       <p><strong>${safeBand}</strong> band · ${escapeHtml(report.confidenceNote ?? '')} ${escapeHtml(report.uncertainty ?? '')}
       ${report.integrityNote ? ` ${escapeHtml(report.integrityNote)}` : ''}</p>
-      ${
-        report.portableCode
-          ? `<p style="margin-top:12px"><strong>Recovery code:</strong> <code style="word-break:break-all">${escapeHtml(report.portableCode)}</code></p>`
-          : ''
-      }
+      <p style="margin-top:12px">Recovery code is available on your results page in the app (not printed here for readability).</p>
     </section>
 
     <footer class="footer">
       <span>Generated by IQMaster</span>
       <span>Report ID: ${safeTestId}</span>
     </footer>
-  </article>
-
-  <article class="page certificate-page" aria-label="Certificate">
-    <div class="certificate-shell">
-      <p class="eyebrow">IQMaster Certificate</p>
-      <h1>Certificate of Cognitive Assessment</h1>
-      <p>This certifies that</p>
-      <h2 style="font-family:Georgia,serif;font-size:34px;margin:14px 0">${safeName}</h2>
-      <p>completed the IQMaster culture-fair matrix assessment and achieved an estimated IQ score of</p>
-      <div class="score">${report.iq}</div>
-      <p>Band <strong>${safeBand}</strong> · Percentile <strong>${report.percentile}</strong>
-      ${country ? ` · ${escapeHtml(country.countryName)} context <strong>${country.delta >= 0 ? '+' : ''}${country.delta}</strong>` : ''}</p>
-      <div class="seal">IQ<br/>MASTER</div>
-      <p style="margin-top:18px;color:#6a7280;font-size:13px">Test ID ${safeTestId} · Issued ${safeDate}</p>
-    </div>
   </article>
 </body>
 </html>`
