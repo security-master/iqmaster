@@ -37,7 +37,8 @@ export function TestResults() {
     countryCode: profile.countryCode,
   })
   const completionMode = session.completionMode ?? (result.answered >= result.questionTotal ? 'full' : 'early')
-  const completionLabel = completionMode === 'full' ? 'Full completion' : 'Early finish'
+  const completionLabel =
+    completionMode === 'full' ? t('results.fullCompletion') : t('results.earlyFinish')
   const country = result.countryComparison
   const maxBar = Math.max(155, result.iq, country?.nationalAverage ?? 100, 100)
   const issued = new Date(session.finishedAt ?? session.createdAt).toLocaleDateString()
@@ -45,44 +46,44 @@ export function TestResults() {
   return (
     <div className="container test-shell results-page">
       <p className="eyebrow">{t('results.title')}</p>
-      <h1 className="results-title">Your personalized IQ dossier</h1>
+      <h1 className="results-title">{t('results.dossier')}</h1>
       <p className="results-sub">
-        Test ID <strong>{testId}</strong> · Security code <strong>{session.securityCode}</strong> · Time{' '}
-        {formatElapsed(session.elapsedSeconds)} · Answered {result.answered}/{result.questionTotal}
+        Test ID <strong>{testId}</strong> · {t('test.payment.securityCode', { code: session.securityCode })} ·{' '}
+        {formatElapsed(session.elapsedSeconds)} · {result.answered}/{result.questionTotal}
       </p>
       {syncNote && <p className="muted">{syncNote}</p>}
 
       <div className="results-hero" style={{ marginTop: '2rem' }}>
         <div className="score-ring">
           <div className="muted" style={{ fontWeight: 700 }}>
-            Estimated IQ
+            {t('results.estimatedIq')}
           </div>
           <div className="score-value">{result.iq}</div>
           <p>
             <strong>{cleanBandLabel(result.band)}</strong>
             {result.confidence !== 'standard' ? (
-              <span className="muted"> · {result.confidence} confidence</span>
+              <span className="muted"> · {result.confidence}</span>
             ) : null}
           </p>
           <p>
-            {ordinal(result.percentile)} percentile · {result.worldRankLabel}
+            {ordinal(result.percentile)} · {result.worldRankLabel}
           </p>
         </div>
         <div className="price-box">
-          <h3>Score analysis</h3>
+          <h3>{t('results.scoreAnalysis')}</h3>
           <p style={{ marginTop: '0.7rem' }}>{result.summary}</p>
           <ul className="checklist">
             <li>
-              Accuracy: {result.accuracy}% ({result.correct}/{result.total})
+              {result.accuracy}% ({result.correct}/{result.total})
             </li>
             <li>
-              Completion: {completionLabel} ({result.answered}/{result.questionTotal} answered)
+              {completionLabel} ({result.answered}/{result.questionTotal})
             </li>
-            <li>Confidence: {result.confidenceNote}</li>
+            <li>{result.confidenceNote}</li>
             <li>{result.uncertainty}</li>
             <li>{result.integrity.note}</li>
             <li>
-              Profile: {profile.name}, age {profile.age}
+              {profile.name}, {profile.age}
               {country ? ` · ${country.countryName}` : ''}
             </li>
           </ul>
@@ -91,7 +92,7 @@ export function TestResults() {
             style={{ marginTop: '1.2rem' }}
             onClick={() => window.print()}
           >
-            Print certificate
+            {t('results.printCertificate')}
           </button>
         </div>
       </div>

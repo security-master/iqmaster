@@ -30,13 +30,28 @@ function getInitialLang(): Language {
   } catch {
     /* ignore storage errors */
   }
+  try {
+    const nav = typeof navigator !== 'undefined' ? navigator.language || '' : ''
+    if (nav.toLowerCase().startsWith('tr')) return 'tr'
+  } catch {
+    /* ignore */
+  }
   return 'en'
+}
+
+type I18nVars = Record<string, string | number>
+
+function applyVars(template: string, vars?: I18nVars): string {
+  if (!vars) return template
+  return template.replace(/\{(\w+)\}/g, (_, key: string) =>
+    vars[key] === undefined || vars[key] === null ? `{${key}}` : String(vars[key]),
+  )
 }
 
 type I18nContextValue = {
   lang: Language
   setLang: (lang: Language) => void
-  t: (key: string) => string
+  t: (key: string, vars?: I18nVars) => string
 }
 
 const I18nContext = createContext<I18nContextValue | null>(null)
@@ -58,7 +73,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [lang])
 
   const t = useCallback(
-    (key: string) => getNested(messages[lang], key) ?? getNested(messages.en, key) ?? key,
+    (key: string, vars?: I18nVars) =>
+      applyVars(getNested(messages[lang], key) ?? getNested(messages.en, key) ?? key, vars),
     [lang],
   )
 

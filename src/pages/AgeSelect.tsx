@@ -1,6 +1,6 @@
-// Route suggestions for orchestrator: /age-groups -> <AgeSelect />, /kids-intro -> <KidsIntro />, keep /iq-test for adult starts.
 import { Link } from 'react-router-dom'
 import { CellSvg } from '../components/PuzzleSvg'
+import { useI18n } from '../i18n/I18nContext'
 import { AGE_BANDS, TEST_BANKS_BY_AGE, type AgeBand } from '../lib/test-catalog'
 
 function bandPreviewCells(band: AgeBand) {
@@ -10,16 +10,15 @@ function bandPreviewCells(band: AgeBand) {
 }
 
 export function AgeSelect() {
+  const { t } = useI18n()
+
   return (
     <main className="container test-shell">
-      <p className="eyebrow">Choose your track</p>
+      <p className="eyebrow">{t('age.eyebrow')}</p>
       <h1 style={{ fontSize: 'clamp(2.3rem, 5vw, 3.8rem)', maxWidth: '13ch', marginTop: '0.6rem' }}>
-        Age-appropriate visual tests
+        {t('age.title')}
       </h1>
-      <p className="section-lead">
-        Pick the version that fits the test taker. Kids and teens banks use visual-only matrix items
-        with shapes, color, motion, and pattern completion.
-      </p>
+      <p className="section-lead">{t('age.lead')}</p>
 
       <div
         style={{
@@ -31,11 +30,12 @@ export function AgeSelect() {
       >
         {AGE_BANDS.map((band) => {
           const preview = bandPreviewCells(band)
+          const label = t(`age.bands.${band.id}.label`)
           return (
             <article className="price-box" key={band.id} style={{ display: 'grid', gap: '1rem' }}>
               <div>
                 <p className="eyebrow">{band.rangeLabel}</p>
-                <h2 style={{ fontSize: '1.8rem', marginTop: '0.35rem' }}>{band.label}</h2>
+                <h2 style={{ fontSize: '1.8rem', marginTop: '0.35rem' }}>{label}</h2>
               </div>
 
               {preview ? (
@@ -58,30 +58,30 @@ export function AgeSelect() {
                     color: 'var(--teal)',
                   }}
                 >
-                  Full IQMaster assessment
+                  {t('age.fullAssessment')}
                 </div>
               )}
 
               <div>
                 <strong style={{ display: 'block', fontFamily: 'var(--font-display)', fontSize: '1.2rem' }}>
-                  {band.difficultyLabel}
+                  {t(`age.bands.${band.id}.difficulty`)}
                 </strong>
-                <p style={{ marginTop: '0.4rem' }}>{band.description}</p>
+                <p style={{ marginTop: '0.4rem' }}>{t(`age.bands.${band.id}.description`)}</p>
               </div>
 
               <div className="stats-row" style={{ gridTemplateColumns: 'repeat(2, 1fr)', marginTop: 0 }}>
                 <div className="stat">
                   <strong>{band.itemCount}</strong>
-                  <span>items</span>
+                  <span>{t('age.items')}</span>
                 </div>
                 <div className="stat">
-                  <strong>{band.bankStatus === 'ready' ? 'Ready' : 'Current'}</strong>
-                  <span>bank status</span>
+                  <strong>{band.bankStatus === 'ready' ? t('age.ready') : t('age.current')}</strong>
+                  <span>{t('age.bankStatus')}</span>
                 </div>
               </div>
 
               <Link className="btn btn-primary" to={band.startPath}>
-                Choose {band.label}
+                {t('age.choose', { label })}
               </Link>
             </article>
           )
