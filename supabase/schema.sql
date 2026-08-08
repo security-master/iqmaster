@@ -71,7 +71,11 @@ create policy "anon select results by credentials" on public.assessment_results
 
 drop policy if exists "anon insert contact" on public.contact_messages;
 create policy "anon insert contact" on public.contact_messages
-  for insert to anon with check (true);
+  for insert to anon, authenticated with check (true);
+
+drop policy if exists "anon select contact" on public.contact_messages;
+create policy "anon select contact" on public.contact_messages
+  for select to anon, authenticated using (true);
 
 drop policy if exists "anon insert invites" on public.org_invites;
 create policy "anon insert invites" on public.org_invites
