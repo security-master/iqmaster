@@ -29,11 +29,14 @@ export function Header() {
           <a href="/#how-it-works" onClick={() => setOpen(false)}>
             How It Works
           </a>
-          <NavLink to="/iq-score" onClick={() => setOpen(false)}>
-            IQ Score
+          <NavLink to="/age-groups" onClick={() => setOpen(false)}>
+            Age Groups
           </NavLink>
-          <NavLink to="/about" onClick={() => setOpen(false)}>
-            About
+          <NavLink to="/packages" onClick={() => setOpen(false)}>
+            Packages
+          </NavLink>
+          <NavLink to="/for-organizations" onClick={() => setOpen(false)}>
+            Organizations
           </NavLink>
           <NavLink to="/blog" onClick={() => setOpen(false)}>
             Blog
@@ -41,7 +44,7 @@ export function Header() {
           <NavLink to="/faq" onClick={() => setOpen(false)}>
             FAQ
           </NavLink>
-          <Link to="/iq-test" className="btn btn-primary nav-cta" onClick={() => setOpen(false)}>
+          <Link to="/age-groups" className="btn btn-primary nav-cta" onClick={() => setOpen(false)}>
             Start IQ Test
           </Link>
         </nav>

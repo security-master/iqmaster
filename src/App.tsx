@@ -43,6 +43,8 @@ export default function App() {
           <Route path="sample-certificate" element={<SampleCertificate />} />
           <Route path="sample-report" element={<SampleReport />} />
           <Route path="display-results" element={<DisplayResults />} />
+          <Route path="age-groups" element={<AgeSelect />} />
+          <Route path="kids-intro" element={<KidsIntro />} />
           <Route path="iq-test" element={<TestStart />} />
           <Route path="iq-test/:testId/complete" element={<TestComplete />} />
           <Route path="iq-test/:testId/payment" element={<TestPayment />} />

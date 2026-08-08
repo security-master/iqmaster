@@ -13,24 +13,24 @@ export function Footer() {
         </div>
         <div className="footer-col">
           <h4>Test</h4>
-          <Link to="/iq-test">Start IQ Test</Link>
+          <Link to="/age-groups">Age Groups</Link>
+          <Link to="/kids-intro">Kids Test</Link>
+          <Link to="/iq-test">Adult IQ Test</Link>
           <Link to="/display-results">Display Results</Link>
-          <Link to="/sample-certificate">Sample Certificate</Link>
-          <Link to="/sample-report">Sample Report</Link>
         </div>
         <div className="footer-col">
-          <h4>Learn</h4>
-          <Link to="/iq-score">IQ Score Guide</Link>
-          <Link to="/blog">Blog</Link>
-          <Link to="/faq">FAQ</Link>
-          <Link to="/about">About Us</Link>
+          <h4>Organizations</h4>
+          <Link to="/packages">Packages</Link>
+          <Link to="/for-organizations">For Organizations</Link>
+          <Link to="/dashboard/org">Org Dashboard</Link>
+          <Link to="/dashboard/credits">Credit History</Link>
         </div>
         <div className="footer-col">
           <h4>Trust</h4>
           <Link to="/pricing">Transparent Pricing</Link>
+          <Link to="/about">About</Link>
           <Link to="/contact">Contact</Link>
-          <Link to="/faq">Help Center</Link>
-          <p style={{ marginTop: '0.8rem' }}>Report unlock: $19</p>
+          <p style={{ marginTop: '0.8rem' }}>Report unlock: $19 · Credits for orgs</p>
         </div>
       </div>
       <div className="container footer-bottom">
