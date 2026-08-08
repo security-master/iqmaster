@@ -923,32 +923,11 @@ p {
   font-size: 0.92rem;
 }
 
-/* Atelier — elite light visual system */
+/* Dark atelier — keep aliases in sync without resetting light tokens */
 :root {
-  --ink: #14181f;
-  --slate: #3d4654;
-  --muted: #6b7280;
-  --mist: #e8eef5;
-  --paper: #f5f7fa;
-  --surface: #ffffff;
-  --primary: #c9a76a;
-  --primary-2: #d8b97f;
-  --primary-3: #e4c892;
-  --primary-deep: #f0dfa8;
-  --primary-soft: rgba(201, 167, 106, 0.14);
-  --signal: #c9a76a;
-  --gold: #c9a76a;
   --teal: var(--primary);
   --teal-deep: var(--primary-deep);
   --teal-soft: var(--primary-soft);
-  --amber: #c9a76a;
-  --amber-soft: rgba(201, 167, 106, 0.12);
-  --line: rgba(243, 245, 248, 0.12);
-  --shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
-  --radius: 12px;
-  --font-display: "Cormorant Garamond", "Times New Roman", serif;
-  --font-body: "Figtree", system-ui, sans-serif;
-  --max: 1120px;
 }
 
 .site-main {
