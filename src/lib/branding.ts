@@ -9,16 +9,23 @@ const KEY = 'iqmaster.branding.v1'
 
 const DEFAULTS: OrgBranding = {
   organizationName: 'IQMaster',
-  primaryColor: '#5b21b6',
-  accentColor: '#7c3aed',
+  primaryColor: '#0e7490',
+  accentColor: '#14b8a6',
   logoText: 'IQMaster',
 }
+
+const LEGACY_PURPLES = new Set(['#5b21b6', '#7c3aed', '#3b0764', '#4c1d95', '#6d28d9'])
 
 export function getBranding(): OrgBranding {
   try {
     const raw = localStorage.getItem(KEY)
     if (!raw) return DEFAULTS
-    return { ...DEFAULTS, ...(JSON.parse(raw) as Partial<OrgBranding>) }
+    const parsed = JSON.parse(raw) as Partial<OrgBranding>
+    // Migrate away from the old purple theme defaults.
+    if (parsed.primaryColor && LEGACY_PURPLES.has(parsed.primaryColor.toLowerCase())) {
+      return DEFAULTS
+    }
+    return { ...DEFAULTS, ...parsed }
   } catch {
     return DEFAULTS
   }

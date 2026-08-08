@@ -216,11 +216,11 @@ export function OrgDashboard() {
             </div>
             <div className="field">
               <label htmlFor="primaryColor">Primary color</label>
-              <input id="primaryColor" name="primaryColor" type="color" defaultValue={branding.primaryColor} />
+              <input id="primaryColor" name="primaryColor" type="color" defaultValue={branding.primaryColor || '#0e7490'} />
             </div>
             <div className="field">
               <label htmlFor="accentColor">Accent color</label>
-              <input id="accentColor" name="accentColor" type="color" defaultValue={branding.accentColor} />
+              <input id="accentColor" name="accentColor" type="color" defaultValue={branding.accentColor || '#14b8a6'} />
             </div>
             <button className="btn btn-primary" type="submit">
               Apply branding
