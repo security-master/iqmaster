@@ -28,6 +28,13 @@ export const messages: Record<'en' | 'tr', MessageTree> = {
         ctaSecondary: 'Preview the certificate',
         meta: '30 visual items · 20–40 minutes · report unlock $19',
       },
+      celebs: {
+        eyebrow: 'Social comparison',
+        title: 'Famous people & celebrity IQ scores',
+        lead: 'See the reported scores behind today’s most talked-about names—then measure your own with IQMaster.',
+        note: 'Scores shown are widely reported estimates for entertainment and comparison. They are not clinical diagnoses.',
+        cta: 'Compare your IQ score',
+      },
     },
     common: {
       language: 'Language',
@@ -64,6 +71,13 @@ export const messages: Record<'en' | 'tr', MessageTree> = {
         ctaPrimary: 'Değerlendirmeye başla',
         ctaSecondary: 'Sertifikayı önizle',
         meta: '30 görsel madde · 20–40 dakika · rapor açılışı $19',
+      },
+      celebs: {
+        eyebrow: 'Sosyal karşılaştırma',
+        title: 'Ünlülerin IQ skorları',
+        lead: 'Günümüzün en konuşulan isimlerinin bildirilen skorlarına bakın—sonra IQMaster ile kendi skorunuzu ölçün.',
+        note: 'Gösterilen skorlar eğlence ve karşılaştırma amaçlı, yaygın bildirilen tahminlerdir. Klinik tanı değildir.',
+        cta: 'IQ skorunuzu karşılaştırın',
       },
     },
     common: {

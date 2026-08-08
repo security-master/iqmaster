@@ -2360,3 +2360,122 @@ p {
   background: #fff !important;
   color: #12151c !important;
 }
+
+/* Famous people / celebrity IQ grid */
+.celebs-section {
+  background: linear-gradient(180deg, #0e1218 0%, #12171f 48%, #0c0f14 100%);
+}
+
+.section-title--wide {
+  max-width: 22ch;
+}
+
+.celebs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.15rem;
+}
+
+.celeb-card {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #151a22;
+  border: 1px solid rgba(243, 245, 248, 0.08);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+}
+
+.celeb-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(201, 167, 106, 0.35);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.38);
+}
+
+.celeb-card__media {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #1c2330;
+}
+
+.celeb-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+  transition: transform 0.55s ease;
+}
+
+.celeb-card:hover .celeb-card__media img {
+  transform: scale(1.04);
+}
+
+.celeb-card__body {
+  padding: 1rem 1rem 1.15rem;
+}
+
+.celeb-card__body h3 {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #f3f5f8;
+  margin: 0;
+}
+
+.celeb-card__score {
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #e8b4b4;
+  letter-spacing: 0.02em;
+}
+
+.celeb-card__score span {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 600;
+  font-style: italic;
+  color: #f07171;
+  margin-right: 0.2rem;
+}
+
+.celebs-note {
+  margin: 1.75rem auto 0;
+  max-width: 56ch;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.celebs-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 960px) {
+  .celebs-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .celebs-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .celeb-card__body {
+    padding: 0.8rem 0.8rem 0.95rem;
+  }
+
+  .celeb-card__body h3 {
+    font-size: 0.9rem;
+  }
+
+  .celeb-card__score span {
+    font-size: 1.25rem;
+  }
+}

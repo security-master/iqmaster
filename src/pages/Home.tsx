@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Seo } from '../components/Seo'
 import { useI18n } from '../i18n/I18nContext'
+import { celebrities } from '../data/celebrities'
 import { asset } from '../lib/asset'
 
 const abilities = [
@@ -119,6 +120,37 @@ export function Home() {
                 For organizations
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section celebs-section" id="celebrity-iq">
+        <div className="container">
+          <div className="section-heading centered">
+            <p className="eyebrow">{t('home.celebs.eyebrow')}</p>
+            <h2 className="section-title section-title--wide">{t('home.celebs.title')}</h2>
+            <p className="section-lead">{t('home.celebs.lead')}</p>
+          </div>
+          <div className="celebs-grid">
+            {celebrities.map((person) => (
+              <article className="celeb-card" key={person.name}>
+                <div className="celeb-card__media">
+                  <img src={person.photo} alt={person.name} width={640} height={800} loading="lazy" />
+                </div>
+                <div className="celeb-card__body">
+                  <h3>{person.name}</h3>
+                  <p className="celeb-card__score">
+                    <span>{person.iq}</span> IQ
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+          <p className="celebs-note">{t('home.celebs.note')}</p>
+          <div className="celebs-cta">
+            <Link to="/iq-test" className="btn btn-primary">
+              {t('home.celebs.cta')}
+            </Link>
           </div>
         </div>
       </section>
