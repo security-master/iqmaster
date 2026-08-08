@@ -1,49 +1,39 @@
 import { Link } from 'react-router-dom'
 import { Seo } from '../components/Seo'
+import { useI18n } from '../i18n/I18nContext'
 
 export function Pricing() {
+  const { t } = useI18n()
   return (
     <div className="container page-hero">
-      <Seo
-        title="Pricing — IQMaster IQ Test Results"
-        description="Take the full 30-question IQ test free. Unlock your score, percentile, analysis, and printable certificate for one flat price — no subscription."
-      />
-      <p className="eyebrow">Pricing</p>
-      <h1>One price. Full unlock.</h1>
-      <p>
-        Take the complete 30-question test at no cost. Pay only when you want the scored report and
-        certificate.
-      </p>
+      <Seo title={t('pricing.seoTitle')} description={t('pricing.seoDescription')} />
+      <p className="eyebrow">{t('pricing.eyebrow')}</p>
+      <h1>{t('pricing.title')}</h1>
+      <p>{t('pricing.lead')}</p>
 
       <div className="split" style={{ marginTop: '2.5rem' }}>
         <div className="price-box">
           <div className="muted" style={{ fontWeight: 700 }}>
-            Results package
+            {t('pricing.package')}
           </div>
           <div className="price">$19</div>
-          <p>Flat unlock — no subscriptions.</p>
+          <p>{t('pricing.flat')}</p>
           <ul className="checklist">
-            <li>Verified IQ score & band</li>
-            <li>Percentile and ranking context</li>
-            <li>Personal analysis summary</li>
-            <li>Printable certificate with your name</li>
-            <li>Online access via Test ID + security code</li>
+            <li>{t('pricing.f1')}</li>
+            <li>{t('pricing.f2')}</li>
+            <li>{t('pricing.f3')}</li>
+            <li>{t('pricing.f4')}</li>
+            <li>{t('pricing.f5')}</li>
           </ul>
           <Link to="/iq-test" className="btn btn-primary" style={{ marginTop: '1.5rem' }}>
-            Start free test
+            {t('pricing.cta')}
           </Link>
         </div>
         <div className="prose">
-          <h2>Why we charge after the test</h2>
-          <p>
-            Scoring, hosting, and certificate generation have a cost. Unlike many IQ funnels, we tell
-            you the price on the homepage and pricing page before you invest half an hour.
-          </p>
-          <h2>Demo checkout</h2>
-          <p>
-            This build includes a demo unlock flow so you can preview the full results experience
-            without a live payment provider. Wire Stripe or PayPal when you deploy to production.
-          </p>
+          <h2>{t('pricing.whyTitle')}</h2>
+          <p>{t('pricing.whyText')}</p>
+          <h2>{t('pricing.demoTitle')}</h2>
+          <p>{t('pricing.demoText')}</p>
         </div>
       </div>
     </div>

@@ -112,6 +112,7 @@ export function finishSession(testId: string) {
 export function completeProfile(
   testId: string,
   profile: { name: string; age: number; gender: Gender; countryCode?: string },
+  lang: 'en' | 'tr' = 'en',
 ) {
   const session = getSession(testId)
   if (!session) return null
@@ -127,6 +128,7 @@ export function completeProfile(
     answers: session.answers,
     track: session.track,
     countryCode: profile.countryCode,
+    lang,
   })
   saveSession(session)
   return session

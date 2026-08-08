@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useI18n } from '../i18n/I18nContext'
 import { renderCertificatePng, type CertificateDetails } from '../lib/report/certificate'
 import {
   canUseNativeShare,
@@ -15,28 +16,29 @@ export type ShareButtonsProps = ShareDetails & {
   certificate?: CertificateDetails
 }
 
-function getStatusMessage(status: NativeShareStatus | 'idle'): string {
-  switch (status) {
-    case 'shared':
-      return 'Share sheet opened.'
-    case 'whatsapp':
-      return 'Opening WhatsApp…'
-    case 'dismissed':
-      return 'Share cancelled.'
-    case 'unavailable':
-      return 'Choose WhatsApp or another network below.'
-    case 'copied':
-      return 'Result text copied — paste anywhere.'
-    default:
-      return ''
-  }
-}
-
 export function ShareButtons(props: ShareButtonsProps) {
+  const { t } = useI18n()
   const [status, setStatus] = useState<NativeShareStatus | 'idle'>('idle')
   const { certificate, ...shareDetails } = props
   const links = getShareLinks(shareDetails)
   const hasNativeShare = canUseNativeShare()
+
+  function statusMessage(s: NativeShareStatus | 'idle'): string {
+    switch (s) {
+      case 'shared':
+        return t('shareUi.shared')
+      case 'whatsapp':
+        return t('shareUi.whatsappOpen')
+      case 'dismissed':
+        return t('shareUi.dismissed')
+      case 'unavailable':
+        return t('shareUi.unavailable')
+      case 'copied':
+        return t('shareUi.copied')
+      default:
+        return ''
+    }
+  }
 
   function onWhatsApp() {
     setStatus('whatsapp')
@@ -57,11 +59,11 @@ export function ShareButtons(props: ShareButtonsProps) {
   }
 
   return (
-    <div className="share-panel" aria-label="Share your IQMaster result">
+    <div className="share-panel" aria-label={t('shareUi.title')}>
       <div className="share-panel__head">
-        <p className="eyebrow">One-tap social share</p>
-        <h3>Share your result</h3>
-        <p>Send your score directly — WhatsApp opens with a ready-to-send message.</p>
+        <p className="eyebrow">{t('shareUi.eyebrow')}</p>
+        <h3>{t('shareUi.title')}</h3>
+        <p>{t('shareUi.lead')}</p>
       </div>
 
       <div className="share-featured">
@@ -69,14 +71,14 @@ export function ShareButtons(props: ShareButtonsProps) {
           className="btn share-whatsapp-btn"
           type="button"
           onClick={onWhatsApp}
-          aria-label="Share directly on WhatsApp"
+          aria-label={t('shareUi.whatsapp')}
         >
           <SocialIcon platform="whatsapp" className="share-icon" />
-          Share on WhatsApp
+          {t('shareUi.whatsapp')}
         </button>
         {hasNativeShare && (
           <button className="btn btn-secondary" type="button" onClick={() => void onNativeShare()}>
-            Share via device
+            {t('shareUi.device')}
           </button>
         )}
       </div>
@@ -131,7 +133,7 @@ export function ShareButtons(props: ShareButtonsProps) {
       </div>
 
       <p className="share-status" aria-live="polite">
-        {getStatusMessage(status)}
+        {statusMessage(status)}
       </p>
     </div>
   )

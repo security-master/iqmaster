@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n/I18nContext'
 import { cleanBandLabel, ordinal } from '../lib/iq'
 import type { ScoreResult } from '../lib/iq'
 
@@ -26,16 +27,19 @@ export function CertificateView({
   questionTotal,
   className = '',
 }: CertificateViewProps) {
+  const { t } = useI18n()
   const displayBand = cleanBandLabel(band)
   const country = countryComparison
   const coverage =
-    answered != null && questionTotal != null ? `${answered}/${questionTotal} items` : null
+    answered != null && questionTotal != null
+      ? t('certUi.items', { answered, total: questionTotal })
+      : null
 
   return (
     <article
       className={`cert-sheet ${className}`.trim()}
       id="certificate"
-      aria-label="IQMaster Certificate"
+      aria-label={t('certUi.title')}
     >
       <div className="cert-sheet__corner cert-sheet__corner--tl" aria-hidden="true" />
       <div className="cert-sheet__corner cert-sheet__corner--tr" aria-hidden="true" />
@@ -46,23 +50,21 @@ export function CertificateView({
       </div>
 
       <div className="cert-sheet__inner">
-        <p className="cert-sheet__brand">IQMaster</p>
+        <p className="cert-sheet__brand">{t('certUi.brand')}</p>
         <div className="cert-sheet__rule" aria-hidden="true" />
-        <h2 className="cert-sheet__title">Certificate of Cognitive Assessment</h2>
-        <p className="cert-sheet__lede">This certifies that</p>
+        <h2 className="cert-sheet__title">{t('certUi.title')}</h2>
+        <p className="cert-sheet__lede">{t('certUi.lede')}</p>
         <h3 className="cert-sheet__name">{name}</h3>
-        <p className="cert-sheet__body">
-          completed the IQMaster culture-fair matrix assessment and achieved an estimated IQ score
-          of
-        </p>
+        <p className="cert-sheet__body">{t('certUi.body')}</p>
 
-        <div className="cert-sheet__score" aria-label={`IQ score ${iq}`}>
+        <div className="cert-sheet__score" aria-label={`${t('certUi.iqScore')} ${iq}`}>
           <strong>{iq}</strong>
-          <span>IQ score</span>
+          <span>{t('certUi.iqScore')}</span>
         </div>
 
         <p className="cert-sheet__meta">
-          Band <strong>{displayBand}</strong> · {ordinal(percentile)} percentile
+          {t('certUi.band')} <strong>{displayBand}</strong> · {ordinal(percentile)}{' '}
+          {t('certUi.percentile')}
           {country ? (
             <>
               {' '}
@@ -82,7 +84,7 @@ export function CertificateView({
 
         <p className="cert-sheet__foot">
           {coverage ? `${coverage} · ` : ''}
-          Test ID {testId} · Issued {issuedLabel}
+          {t('certUi.testId', { id: testId, date: issuedLabel })}
         </p>
       </div>
     </article>

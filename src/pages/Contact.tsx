@@ -31,44 +31,40 @@ export function Contact() {
     }
   }
 
+  const delivery = isSupabaseConfigured()
+    ? t('contact.supabase')
+    : import.meta.env.VITE_CONTACT_TO_EMAIL
+      ? t('contact.emailGw')
+      : t('contact.local')
+
   return (
     <div className="container page-hero">
-      <Seo
-        title="Contact — IQMaster"
-        description="Questions about your Test ID, certificate, pricing, or organization packages? Send a message to the IQMaster team."
-      />
-      <p className="eyebrow">Contact</p>
+      <Seo title={t('contact.seoTitle')} description={t('contact.seoDescription')} />
+      <p className="eyebrow">{t('contact.eyebrow')}</p>
       <h1>{t('contact.title')}</h1>
-      <p>Questions about your Test ID, certificate, or partnership ideas — send a note.</p>
+      <p>{t('contact.lead')}</p>
       <p className="muted" style={{ marginTop: '0.6rem' }}>
-        Delivery:{' '}
-        {isSupabaseConfigured()
-          ? 'Supabase inbox'
-          : import.meta.env.VITE_CONTACT_TO_EMAIL
-            ? 'Email gateway'
-            : 'Local demo inbox (configure Supabase or VITE_CONTACT_TO_EMAIL for delivery)'}
+        {t('contact.delivery')} {delivery}
       </p>
 
       <form className="form-grid" style={{ marginTop: '2rem' }} onSubmit={onSubmit}>
         <div className="field">
-          <label htmlFor="name">Name</label>
+          <label htmlFor="name">{t('contact.name')}</label>
           <input id="name" name="name" required />
         </div>
         <div className="field">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">{t('contact.email')}</label>
           <input id="email" name="email" type="email" required />
         </div>
         <div className="field">
-          <label htmlFor="message">Message</label>
+          <label htmlFor="message">{t('contact.message')}</label>
           <textarea id="message" name="message" required />
         </div>
         <button className="btn btn-primary" type="submit" disabled={busy}>
-          {busy ? 'Sending…' : t('contact.submit')}
+          {busy ? t('contact.sending') : t('contact.submit')}
         </button>
-        {status === 'sent' && <p className="notice">Message received.</p>}
-        {status === 'error' && (
-          <p className="notice">Could not send right now. Email hello@iqmaster.app instead.</p>
-        )}
+        {status === 'sent' && <p className="notice">{t('contact.sent')}</p>}
+        {status === 'error' && <p className="notice">{t('contact.error')}</p>}
       </form>
     </div>
   )

@@ -1,31 +1,30 @@
 import { CertificateView } from '../components/CertificateView'
+import { useI18n } from '../i18n/I18nContext'
 
 export function SampleCertificate() {
+  const { t, lang } = useI18n()
   return (
     <div className="container page-hero">
-      <p className="eyebrow">Sample</p>
-      <h1>IQ certificate preview</h1>
-      <p>
-        This is the premium layout you receive after unlocking results — downloadable on its own as
-        PDF or image, separate from the analysis report.
-      </p>
+      <p className="eyebrow">{t('sample.certEyebrow')}</p>
+      <h1>{t('sample.certTitle')}</h1>
+      <p>{t('sample.certLead')}</p>
       <div style={{ marginTop: '2rem' }}>
         <CertificateView
           name="Alex Rivera"
           iq={128}
-          band="Superior"
+          band={lang === 'tr' ? 'Üstün' : 'Superior'}
           percentile={97}
           testId="SAMPLEDEMO"
-          issuedLabel="for demonstration"
+          issuedLabel={t('sample.issued')}
           answered={30}
           questionTotal={30}
           countryComparison={{
             countryCode: 'TR',
-            countryName: 'Türkiye',
+            countryName: lang === 'tr' ? 'Türkiye' : 'Türkiye',
             nationalAverage: 89,
             userIq: 128,
             delta: 39,
-            label: 'Well above the Türkiye national average',
+            label: '',
           }}
         />
       </div>

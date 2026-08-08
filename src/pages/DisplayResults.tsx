@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Seo } from '../components/Seo'
+import { useI18n } from '../i18n/I18nContext'
 import { decodePortableResult } from '../lib/portable'
 import { normalizeScoreResult } from '../lib/iq'
 import { findByCredentials, saveSession, type TestSession } from '../lib/session'
@@ -8,6 +9,7 @@ import { fetchRemoteSession } from '../lib/sync'
 
 export function DisplayResults() {
   const navigate = useNavigate()
+  const { t } = useI18n()
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -24,7 +26,7 @@ export function DisplayResults() {
       if (portable) {
         const decoded = decodePortableResult(portable)
         if (!decoded) {
-          setError('Recovery code is invalid or corrupted.')
+          setError(t('display.badCode'))
           return
         }
         const session: TestSession = {
@@ -53,7 +55,7 @@ export function DisplayResults() {
         if (session) saveSession(session)
       }
       if (!session) {
-        setError('No matching result found in this browser or remote store.')
+        setError(t('display.notFound'))
         return
       }
       navigate(session.paid ? `/iq-test/${session.testId}/results` : `/iq-test/${session.testId}/payment`)
@@ -64,29 +66,26 @@ export function DisplayResults() {
 
   return (
     <div className="container page-hero">
-      <Seo
-        title="Display results — IQMaster"
-        description="Reopen your IQMaster results with Test ID + security code, or paste a recovery code."
-      />
-      <p className="eyebrow">Display results</p>
-      <h1>Reopen your assessment</h1>
-      <p>Use Test ID + security code, or paste a portable recovery code from another device.</p>
+      <Seo title={t('display.seoTitle')} description={t('display.seoDescription')} />
+      <p className="eyebrow">{t('display.eyebrow')}</p>
+      <h1>{t('display.title')}</h1>
+      <p>{t('display.lead')}</p>
 
       <form className="form-grid" style={{ marginTop: '2rem', maxWidth: 560 }} onSubmit={onSubmit}>
         <div className="field">
-          <label htmlFor="testId">Test ID</label>
+          <label htmlFor="testId">{t('display.testId')}</label>
           <input id="testId" name="testId" placeholder="IQM-...." />
         </div>
         <div className="field">
-          <label htmlFor="securityCode">Security code</label>
-          <input id="securityCode" name="securityCode" placeholder="6-digit code" />
+          <label htmlFor="securityCode">{t('display.securityCode')}</label>
+          <input id="securityCode" name="securityCode" placeholder="••••••" />
         </div>
         <div className="field">
-          <label htmlFor="portable">Or recovery code (IQM1.…)</label>
+          <label htmlFor="portable">{t('display.portable')}</label>
           <textarea id="portable" name="portable" placeholder="IQM1...." rows={3} />
         </div>
         <button className="btn btn-primary" type="submit" disabled={busy}>
-          {busy ? 'Looking up…' : 'Open results'}
+          {busy ? t('display.looking') : t('display.open')}
         </button>
         {error && <p className="notice">{error}</p>}
       </form>
