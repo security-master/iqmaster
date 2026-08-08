@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { asset } from '../lib/asset'
 
 const abilities = [
   ['Memory Retrieval', 'Store, compare, and retrieve patterns while solving each visual item.'],
@@ -33,21 +34,21 @@ const testimonials = [
       'The questions felt challenging without being confusing. The report made my score and percentile easy to understand.',
     name: 'Sandra Bennett',
     location: 'Canada',
-    photo: '/images/avatar-sandra.jpg',
+    photo: asset('/images/avatar-sandra.jpg'),
   },
   {
     quote:
       'A clean way to test yourself online. I liked that the certificate and pricing were clear before I started.',
     name: 'George H. Lewis',
     location: 'United States',
-    photo: '/images/avatar-george.jpg',
+    photo: asset('/images/avatar-george.jpg'),
   },
   {
     quote:
       'Fast, polished, and more informative than the old IQ test sites I remembered from years ago.',
     name: 'Jordan Stevenson',
     location: 'United Kingdom',
-    photo: '/images/avatar-jordan.jpg',
+    photo: asset('/images/avatar-jordan.jpg'),
   },
 ]
 
@@ -65,7 +66,7 @@ export function Home() {
         <div className="hero-media" aria-hidden="true">
           <img
             className="hero-photo"
-            src="/images/hero-focus.jpg"
+            src={asset('/images/hero-focus.jpg')}
             alt=""
             width={2000}
             height={1333}
@@ -95,7 +96,7 @@ export function Home() {
         <div className="container people-split">
           <figure className="people-figure">
             <img
-              src="/images/cta-people.jpg"
+              src={asset('/images/cta-people.jpg')}
               alt="Professionals collaborating after cognitive assessments"
               width={1600}
               height={1067}
@@ -156,7 +157,7 @@ export function Home() {
           </div>
           <figure className="people-figure">
             <img
-              src="/images/section-study.jpg"
+              src={asset('/images/section-study.jpg')}
               alt="Person focused on a cognitive assessment session"
               width={1600}
               height={1067}
@@ -192,7 +193,7 @@ export function Home() {
         <div className="container people-split">
           <figure className="people-figure">
             <img
-              src="/images/section-coach.jpg"
+              src={asset('/images/section-coach.jpg')}
               alt="Coach reviewing assessment results with a client"
               width={1600}
               height={1067}
@@ -223,7 +224,7 @@ export function Home() {
           <div className="cta-band cta-band--photo">
             <img
               className="cta-band__photo"
-              src="/images/hero-portrait.jpg"
+              src={asset('/images/hero-portrait.jpg')}
               alt=""
               width={1800}
               height={1200}

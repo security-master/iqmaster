@@ -60,20 +60,12 @@ Connect `security-master/iqmaster` in Workers & Pages → Create → Connect to 
 
 Scores are entertainment/education estimates, not clinical diagnoses.
 
-## Live preview
+## Live site
 
-- Temporary site: https://iqmaster-preview.dandelion-flock.workers.dev
-- Progress: https://iqmaster-preview.dandelion-flock.workers.dev/progress
+- **Production:** https://security-master.github.io/iqmaster/
 - Local: http://127.0.0.1:5173
-- Claim temporary Cloudflare account (≈60 min):  
-  https://dash.cloudflare.com/claim-preview?claimToken=IBCVMKqwMippyvStCt_CEin2FI4WWLvK4J-X3bpwwg4
 
-### Permanent hosting (recommended)
-
-1. Open https://github.com/security-master/iqmaster/settings/pages
-2. Source → **GitHub Actions**
-3. Push to `main` (workflow: Deploy GitHub Pages)
-4. Site URL will be: `https://security-master.github.io/iqmaster/`
+GitHub Pages is deployed automatically from `main` via **Deploy GitHub Pages**.
 
 ```bash
 npm run build

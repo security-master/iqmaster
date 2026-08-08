@@ -24,9 +24,11 @@ import { TestResults } from './pages/TestResults'
 import { ProgressBoard } from './pages/ProgressBoard'
 import { TestStart } from './pages/TestStart'
 
+const routerBasename = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') || '/'
+
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={routerBasename === '/' ? undefined : routerBasename}>
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />
