@@ -1,25 +1,7 @@
-import type { CSSProperties } from 'react'
 import { downloadReportHtml, printReportPdf, type ReportDetails } from '../lib/report/pdf'
 import { ShareButtons } from './ShareButtons'
 
 export type ReportActionsProps = ReportDetails
-
-const actionsStyle = {
-  display: 'grid',
-  gap: '1.25rem',
-  marginTop: '2rem',
-  padding: '1.5rem',
-  border: '1px solid var(--line)',
-  borderRadius: 'var(--radius)',
-  background: 'rgba(255, 255, 255, 0.78)',
-} satisfies CSSProperties
-
-const buttonRowStyle = {
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: '0.75rem',
-  alignItems: 'center',
-} satisfies CSSProperties
 
 export function ReportActions(props: ReportActionsProps) {
   const report: ReportDetails = props
@@ -35,26 +17,25 @@ export function ReportActions(props: ReportActionsProps) {
   }
 
   return (
-    <section className="no-print" aria-labelledby="report-actions-title" style={actionsStyle}>
+    <section className="report-actions no-print" aria-labelledby="report-actions-title">
       <div>
-        <p className="eyebrow">Report actions</p>
-        <h2 id="report-actions-title" style={{ marginTop: '0.45rem' }}>
-          Download and share
-        </h2>
-        <p style={{ marginTop: '0.55rem' }}>
-          Open a print-ready evaluation report (ability profile, confidence, integrity notes) for PDF
-          save, or download the HTML fallback.
+        <p className="eyebrow">Paid unlock deliverables</p>
+        <h2 id="report-actions-title">Download your PDF dossier</h2>
+        <p>
+          Get a comprehensive, personalized report: national comparison, difficulty breakdown,
+          item-level correct/incorrect map, ability profile, integrity notes, and a print-ready
+          certificate page.
         </p>
       </div>
 
-      <div style={buttonRowStyle}>
+      <div className="report-actions__buttons">
         <button
           className="btn btn-primary"
           type="button"
           aria-label="Open a print-ready IQMaster report to save as PDF"
           onClick={onPrintReport}
         >
-          Download PDF
+          Download PDF report
         </button>
         <button
           className="btn btn-secondary"

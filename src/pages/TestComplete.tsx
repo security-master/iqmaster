@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
-import { QUESTIONS } from '../data/questions'
+import { COUNTRY_IQ } from '../data/country-iq'
+import { getQuestionsForTrack } from '../lib/banks'
 import type { Gender } from '../lib/iq'
 import { completeProfile, countAnswered, getSession } from '../lib/session'
 
@@ -12,8 +13,9 @@ export function TestComplete() {
 
   if (!session) return <Navigate to="/iq-test" replace />
 
+  const questionTotal = getQuestionsForTrack(session.track).length
   const answeredCount = session.answeredCount ?? countAnswered(session.answers)
-  const completionMode = answeredCount >= QUESTIONS.length ? 'full' : 'early'
+  const completionMode = answeredCount >= questionTotal ? 'full' : 'early'
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -21,11 +23,12 @@ export function TestComplete() {
     const name = String(data.get('name') ?? '').trim()
     const age = Number(data.get('age'))
     const gender = String(data.get('gender')) as Gender
-    if (!name || !age || age < 8 || age > 100 || !gender) {
-      setError('Please provide a valid name, age (8–100), and gender selection.')
+    const countryCode = String(data.get('country') ?? '').trim()
+    if (!name || !age || age < 8 || age > 100 || !gender || !countryCode) {
+      setError('Please provide a valid name, age (8–100), gender, and country.')
       return
     }
-    completeProfile(testId, { name, age, gender })
+    completeProfile(testId, { name, age, gender, countryCode })
     navigate(`/iq-test/${testId}/payment`)
   }
 
@@ -34,11 +37,11 @@ export function TestComplete() {
       <p className="eyebrow">Completed</p>
       <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>Your test has been submitted</h1>
       <p style={{ marginTop: '0.8rem', maxWidth: '52ch' }}>
-        Enter your details to personalize the certificate and age-normed report. Test ID:{' '}
-        <strong>{testId}</strong>
+        Enter your details to personalize the certificate, national IQ comparison, and age-normed
+        report. Test ID: <strong>{testId}</strong>
       </p>
       <p className="notice" style={{ marginTop: '1rem' }}>
-        Answered {answeredCount} of {QUESTIONS.length} items ·{' '}
+        Answered {answeredCount} of {questionTotal} items ·{' '}
         {completionMode === 'full' ? 'Full completion' : 'Early finish with confidence-adjusted scoring'}
       </p>
 
@@ -63,8 +66,18 @@ export function TestComplete() {
             <option value="prefer_not">Prefer not to say</option>
           </select>
         </div>
+        <div className="field">
+          <label htmlFor="country">Country *</label>
+          <select id="country" name="country" required defaultValue="TR">
+            {COUNTRY_IQ.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.name} (avg IQ {c.average})
+              </option>
+            ))}
+          </select>
+        </div>
         <button className="btn btn-primary" type="submit">
-          Show my IQ test results
+          Continue to unlock results
         </button>
         {error && <p className="notice">{error}</p>}
       </form>
