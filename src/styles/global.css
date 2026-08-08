@@ -2332,7 +2332,7 @@ p {
 .testimonial-card:not(.testimonial-card--atelier) {
   background: var(--surface) !important;
   color: var(--ink);
-  border-color: rgba(243, 245, 248, 0.1) !important;
+  border-color: var(--line) !important;
 }
 
 .field input,
