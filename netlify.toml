@@ -1,0 +1,11 @@
+[build]
+command = "npm run build"
+publish = "dist"
+
+# SPA fallback so client-side routes resolve to the app shell.
+# API routes are handled by Netlify Functions (see netlify/functions) and
+# take precedence over this catch-all.
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200

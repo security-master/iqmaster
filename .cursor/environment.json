@@ -1,0 +1,10 @@
+{
+  "name": "IQ Master",
+  "install": "npm install",
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "npm run dev"
+    }
+  ]
+}
