@@ -1,4 +1,5 @@
 import { Navigate, useParams } from 'react-router-dom'
+import { ordinal } from '../lib/iq'
 import { formatElapsed, getSession } from '../lib/session'
 
 export function TestResults() {
@@ -32,7 +33,7 @@ export function TestResults() {
             <strong>{result.band}</strong>
           </p>
           <p>
-            {result.percentile}th percentile · {result.worldRankLabel}
+            {ordinal(result.percentile)} percentile · {result.worldRankLabel}
           </p>
         </div>
         <div className="price-box">

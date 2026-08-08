@@ -107,6 +107,10 @@ export function TestQuestion() {
             </Link>
           )}
         </div>
+        <p className="muted" style={{ marginTop: '0.85rem', fontSize: '0.92rem' }}>
+          Answered {session.answers.filter((a) => a != null).length} of {QUESTIONS.length} — you can
+          revisit any item before finishing.
+        </p>
       </div>
     </div>
   )

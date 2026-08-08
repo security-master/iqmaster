@@ -48,6 +48,21 @@ function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n))
 }
 
+export function ordinal(n: number): string {
+  const v = n % 100
+  if (v >= 11 && v <= 13) return `${n}th`
+  switch (n % 10) {
+    case 1:
+      return `${n}st`
+    case 2:
+      return `${n}nd`
+    case 3:
+      return `${n}rd`
+    default:
+      return `${n}th`
+  }
+}
+
 /** Map raw accuracy to an IQ-like score (mean 100, SD ~15), entertainment use. */
 export function scoreAnswers(correctCount: number, total: number, age: number): ScoreResult {
   const accuracy = total === 0 ? 0 : correctCount / total
