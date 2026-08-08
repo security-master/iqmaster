@@ -59,3 +59,18 @@ Connect `security-master/iqmaster` in Workers & Pages → Create → Connect to 
 ## Note
 
 Scores are entertainment/education estimates, not clinical diagnoses.
+
+## Live preview
+
+Temporary Cloudflare Workers preview (claim within ~60 minutes of deploy):
+
+- Site: https://iqmaster-preview.abalone-shelf.workers.dev
+- Claim account: https://dash.cloudflare.com/claim-preview?claimToken=y8MoI_SqJMFqioMa7rxWL5ivdbOhtFYPdH5PQx_2-YQ
+
+Redeploy preview:
+
+```bash
+npm run build
+rm -f dist/_redirects
+npx wrangler deploy --temporary --config wrangler.preview.toml
+```
