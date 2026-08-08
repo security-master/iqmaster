@@ -21,7 +21,7 @@
 | ID | İş | Ajan ID | Dosya sahipliği | % | Durum |
 |----|-----|---------|-----------------|---|--------|
 | A | Tasarımı referansa yaklaştır | `bc-3748bdb0…` | styles, Header/Footer, Home/About/FAQ | 35% | in_progress |
-| B | Erken bitirme + görsel-only motor | `bc-b2cf550a…` | session/iq, Test*, questions.ts | 5% | running |
+| B | Erken bitirme + görsel-only motor | `bc-b2cf550a…` | session/iq, Test*, questions.ts | 100% | done |
 | C | Yaş grupları + çocuk bankaları | `bc-42f69d55…` | test-catalog, kids/teens banks, AgeSelect | 5% | running |
 | D | B2B paket/kredi iskeleti | `bc-2f3779d6…` | packages, billing, OrgDashboard | 100% | done |
 | E | PDF + sosyal paylaşım | `bc-c74bb61b…` | report/*, ShareButtons, ReportActions | 100% | done |
