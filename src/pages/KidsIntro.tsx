@@ -3,7 +3,7 @@ import { MatrixSvg } from '../components/PuzzleSvg'
 import { KIDS_TEST_BANK } from '../data/test-banks/kids'
 import { AGE_BANDS } from '../lib/test-catalog'
 
-const KIDS_TEST_ROUTE_SUGGESTION = '/kids-test'
+const KIDS_TEST_ROUTE = '/iq-test?track=kids'
 
 const kidsBand = AGE_BANDS.find((band) => band.id === 'kids') ?? AGE_BANDS[0]
 const previewItem = KIDS_TEST_BANK[0]
@@ -40,7 +40,7 @@ export function KidsIntro() {
           </div>
 
           <div className="hero-actions" style={{ marginTop: '1.5rem' }}>
-            <Link className="btn btn-primary" to={KIDS_TEST_ROUTE_SUGGESTION}>
+            <Link className="btn btn-primary" to={KIDS_TEST_ROUTE}>
               Start kids visual test
             </Link>
             <Link className="btn btn-secondary" to="/age-groups">

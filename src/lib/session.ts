@@ -1,11 +1,12 @@
 import { createSecurityCode, createTestId } from './id'
 import { scoreAnswers, type CompletionMode, type Gender, type ScoreResult } from './iq'
-import { QUESTIONS, countCorrect } from '../data/questions'
+import { countCorrectForTrack, getQuestionsForTrack, type TrackId } from './banks'
 
 export interface TestSession {
   testId: string
   securityCode: string
   createdAt: string
+  track: TrackId
   answers: Array<number | null>
   answeredCount: number
   startedAt: string
@@ -37,12 +38,14 @@ function writeAll(data: Record<string, TestSession>) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
 }
 
-export function createSession(): TestSession {
+export function createSession(track: TrackId = 'adult'): TestSession {
+  const bank = getQuestionsForTrack(track)
   const session: TestSession = {
     testId: createTestId(),
     securityCode: createSecurityCode(),
     createdAt: new Date().toISOString(),
-    answers: Array.from({ length: QUESTIONS.length }, () => null),
+    track,
+    answers: Array.from({ length: bank.length }, () => null),
     answeredCount: 0,
     startedAt: new Date().toISOString(),
     elapsedSeconds: 0,
@@ -56,7 +59,10 @@ export function createSession(): TestSession {
 }
 
 export function getSession(testId: string): TestSession | null {
-  return readAll()[testId] ?? null
+  const session = readAll()[testId] ?? null
+  if (!session) return null
+  if (!session.track) session.track = 'adult'
+  return session
 }
 
 export function saveSession(session: TestSession) {
@@ -86,16 +92,17 @@ export function countAnswered(answers: Array<number | null>): number {
   return answers.filter((answer) => answer !== null).length
 }
 
-function completionModeFor(answeredCount: number): CompletionMode {
-  return answeredCount >= QUESTIONS.length ? 'full' : 'early'
+function completionModeFor(answeredCount: number, total: number): CompletionMode {
+  return answeredCount >= total ? 'full' : 'early'
 }
 
 export function finishSession(testId: string) {
   const session = getSession(testId)
   if (!session) return null
+  const total = getQuestionsForTrack(session.track).length
   const answeredCount = countAnswered(session.answers)
   session.answeredCount = answeredCount
-  session.completionMode = completionModeFor(answeredCount)
+  session.completionMode = completionModeFor(answeredCount, total)
   session.finishedAt = session.finishedAt ?? new Date().toISOString()
   saveSession(session)
   return session
@@ -107,13 +114,14 @@ export function completeProfile(
 ) {
   const session = getSession(testId)
   if (!session) return null
+  const total = getQuestionsForTrack(session.track).length
   const answeredCount = countAnswered(session.answers)
   session.profile = profile
   session.answeredCount = answeredCount
-  session.completionMode = completionModeFor(answeredCount)
+  session.completionMode = completionModeFor(answeredCount, total)
   session.finishedAt = session.finishedAt ?? new Date().toISOString()
-  const correct = countCorrect(session.answers)
-  session.result = scoreAnswers(correct, answeredCount, profile.age, QUESTIONS.length)
+  const correct = countCorrectForTrack(session.answers, session.track)
+  session.result = scoreAnswers(correct, answeredCount, profile.age, total)
   saveSession(session)
   return session
 }

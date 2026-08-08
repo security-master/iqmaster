@@ -47,6 +47,7 @@ export default function App() {
           <Route path="display-results" element={<DisplayResults />} />
           <Route path="age-groups" element={<AgeSelect />} />
           <Route path="kids-intro" element={<KidsIntro />} />
+          <Route path="kids-test" element={<Navigate to="/iq-test?track=kids" replace />} />
           <Route path="iq-test" element={<TestStart />} />
           <Route path="iq-test/:testId/complete" element={<TestComplete />} />
           <Route path="iq-test/:testId/payment" element={<TestPayment />} />

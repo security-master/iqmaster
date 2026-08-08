@@ -1,15 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { CellSvg, MatrixSvg } from '../components/PuzzleSvg'
-import { QUESTIONS } from '../data/questions'
+import { getQuestionsForTrack } from '../lib/banks'
 import { countAnswered, finishSession, formatElapsed, getSession, setAnswer, updateElapsed } from '../lib/session'
 
 export function TestQuestion() {
   const { testId = '', number = '1' } = useParams()
   const navigate = useNavigate()
   const index = Number(number) - 1
-  const question = QUESTIONS[index]
   const session = getSession(testId)
+  const questions = useMemo(
+    () => getQuestionsForTrack(session?.track ?? 'adult'),
+    [session?.track],
+  )
+  const question = questions[index]
   const [elapsed, setElapsed] = useState(session?.elapsedSeconds ?? 0)
   const [selected, setSelected] = useState<number | null>(session?.answers[index] ?? null)
 
@@ -33,8 +37,8 @@ export function TestQuestion() {
     return () => window.clearInterval(timer)
   }, [testId, session, navigate])
 
-  if (!session) return <Navigate to="/iq-test" replace />
-  if (!question || Number.isNaN(index) || index < 0 || index >= QUESTIONS.length) {
+  if (!session) return <Navigate to="/age-groups" replace />
+  if (!question || Number.isNaN(index) || index < 0 || index >= questions.length) {
     return <Navigate to={`/iq-test/${testId}/1`} replace />
   }
 
@@ -50,7 +54,7 @@ export function TestQuestion() {
     if (
       currentAnsweredCount < 8 &&
       !window.confirm(
-        `You have answered ${currentAnsweredCount} of ${QUESTIONS.length} items. Finish now with a low-confidence provisional score?`,
+        `You have answered ${currentAnsweredCount} of ${questions.length} items. Finish now with a low-confidence provisional score?`,
       )
     ) {
       return
@@ -59,17 +63,17 @@ export function TestQuestion() {
     navigate(`/iq-test/${testId}/complete`)
   }
 
-  const isLast = index === QUESTIONS.length - 1
+  const isLast = index === questions.length - 1
   const answeredCount = countAnswered(session.answers)
 
   return (
     <div className="container test-shell">
       <div className="test-topbar">
         <div>
-          Your Test ID: <strong>{testId}</strong>
+          Your Test ID: <strong>{testId}</strong> · {session.track}
         </div>
         <div>
-          Question {index + 1}/{QUESTIONS.length}
+          Question {index + 1}/{questions.length}
         </div>
         <div aria-live="polite">{formatElapsed(elapsed)}</div>
       </div>
@@ -110,7 +114,7 @@ export function TestQuestion() {
           >
             ←
           </button>
-          {QUESTIONS.map((_, i) => (
+          {questions.map((_, i) => (
             <button
               key={i}
               type="button"
@@ -125,13 +129,18 @@ export function TestQuestion() {
               →
             </button>
           ) : (
-            <button type="button" className="btn btn-primary" style={{ marginLeft: '0.5rem' }} onClick={finishNow}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{ marginLeft: '0.5rem' }}
+              onClick={finishNow}
+            >
               Finish
             </button>
           )}
         </div>
         <p className="muted" style={{ marginTop: '0.85rem', fontSize: '0.92rem' }}>
-          Answered {answeredCount} of {QUESTIONS.length} — you can revisit any item before finishing.
+          Answered {answeredCount} of {questions.length} — you can revisit any item before finishing.
         </p>
       </div>
     </div>
