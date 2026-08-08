@@ -1,0 +1,33 @@
+import { Link, useParams } from 'react-router-dom'
+import { getPost } from '../data/blog'
+
+export function BlogPost() {
+  const { slug } = useParams()
+  const post = slug ? getPost(slug) : undefined
+
+  if (!post) {
+    return (
+      <div className="container page-hero">
+        <h1>Post not found</h1>
+        <Link to="/blog">Back to blog</Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className="container page-hero">
+      <p className="eyebrow">{post.date}</p>
+      <h1>{post.title}</h1>
+      <div className="prose" style={{ marginTop: '1.5rem' }}>
+        {post.body.map((paragraph) => (
+          <p key={paragraph}>{paragraph}</p>
+        ))}
+        <p style={{ marginTop: '2rem' }}>
+          <Link to="/iq-test" className="btn btn-primary">
+            Take the IQ test
+          </Link>
+        </p>
+      </div>
+    </div>
+  )
+}
