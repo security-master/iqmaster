@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
+import { CertificateView } from '../components/CertificateView'
 import { ReportActions } from '../components/ReportActions'
-import { normalizeScoreResult, ordinal } from '../lib/iq'
+import { cleanBandLabel, normalizeScoreResult, ordinal } from '../lib/iq'
 import { encodePortableResult } from '../lib/portable'
 import { formatElapsed, getSession } from '../lib/session'
 import { syncSessionRemote } from '../lib/sync'
@@ -10,7 +11,7 @@ import { useI18n } from '../i18n/I18nContext'
 export function TestResults() {
   const { testId = '' } = useParams()
   const session = getSession(testId)
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [portableCode, setPortableCode] = useState('')
   const [syncNote, setSyncNote] = useState('')
 
@@ -58,7 +59,10 @@ export function TestResults() {
           </div>
           <div className="score-value">{result.iq}</div>
           <p>
-            <strong>{result.band}</strong>
+            <strong>{cleanBandLabel(result.band)}</strong>
+            {result.confidence !== 'standard' ? (
+              <span className="muted"> · {result.confidence} confidence</span>
+            ) : null}
           </p>
           <p>
             {ordinal(result.percentile)} percentile · {result.worldRankLabel}
@@ -241,43 +245,28 @@ export function TestResults() {
           itemAnalysis={result.itemAnalysis}
           age={profile.age}
           countryCode={profile.countryCode}
+          lang={lang}
         />
       </div>
 
-      <div className="certificate certificate--elite" id="certificate">
-        <div className="certificate__ornament" aria-hidden="true" />
-        <p className="eyebrow">IQMaster Certificate</p>
-        <h2>Certificate of Cognitive Assessment</h2>
-        <p>This certifies that</p>
-        <h3 className="certificate__name">{profile.name}</h3>
-        <p>
-          completed the IQMaster culture-fair matrix assessment and achieved an estimated IQ score of
+      <section className="section results-block certificate-section">
+        <p className="eyebrow">Premium certificate</p>
+        <h2 className="section-title section-title--wide">Print-ready, share-ready</h2>
+        <p className="section-lead">
+          Independent from the analysis report — download as PDF or image, or share on WhatsApp above.
         </p>
-        <div className="score-value certificate__score">{result.iq}</div>
-        <p>
-          Band: <strong>{result.band}</strong> · Percentile: <strong>{result.percentile}</strong>
-          {country ? (
-            <>
-              {' '}
-              · {country.countryName}:{' '}
-              <strong>
-                {country.delta >= 0 ? '+' : ''}
-                {country.delta}
-              </strong>
-            </>
-          ) : null}
-        </p>
-        <div className="certificate__seal" aria-hidden="true">
-          IQ
-          <span>MASTER</span>
-        </div>
-        <p className="muted certificate__meta">
-          {completionLabel} · {result.answered}/{result.questionTotal} items · {result.confidence} confidence
-        </p>
-        <p className="muted certificate__meta">
-          Test ID {testId} · Issued {issued}
-        </p>
-      </div>
+        <CertificateView
+          name={profile.name}
+          iq={result.iq}
+          band={result.band}
+          percentile={result.percentile}
+          testId={testId}
+          issuedLabel={issued}
+          countryComparison={result.countryComparison}
+          answered={result.answered}
+          questionTotal={result.questionTotal}
+        />
+      </section>
     </div>
   )
 }

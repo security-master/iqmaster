@@ -17,6 +17,10 @@ export function TestComplete() {
   const answeredCount = session.answeredCount ?? countAnswered(session.answers)
   const completionMode = answeredCount >= questionTotal ? 'full' : 'early'
 
+  if (answeredCount < 1) {
+    return <Navigate to={`/iq-test/${testId}/1`} replace />
+  }
+
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const data = new FormData(e.currentTarget)

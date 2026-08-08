@@ -51,6 +51,10 @@ export function TestQuestion() {
     const latestSession = getSession(testId) ?? session
     if (!latestSession) return
     const currentAnsweredCount = countAnswered(latestSession.answers)
+    if (currentAnsweredCount < 1) {
+      window.alert('Answer at least one question before finishing. For a reliable IQ estimate, answer 8 or more.')
+      return
+    }
     if (
       currentAnsweredCount < 8 &&
       !window.confirm(
