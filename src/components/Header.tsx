@@ -6,10 +6,14 @@ export function Header() {
   const [open, setOpen] = useState(false)
   const { lang, setLang, t } = useI18n()
 
+  function close() {
+    setOpen(false)
+  }
+
   return (
     <header className="site-header">
       <div className="container header-inner">
-        <Link to="/" className="brand" onClick={() => setOpen(false)}>
+        <Link to="/" className="brand" onClick={close}>
           <span className="brand-mark">IQ</span>
           <span>
             IQMaster
@@ -24,23 +28,26 @@ export function Header() {
           aria-label="Toggle menu"
           onClick={() => setOpen((v) => !v)}
         >
-          Menu
+          {open ? 'Close' : 'Menu'}
         </button>
 
         <nav className={`nav ${open ? 'open' : ''}`}>
-          <NavLink to="/age-groups" onClick={() => setOpen(false)}>
+          <NavLink to="/age-groups" onClick={close}>
             {t('nav.ageGroups')}
           </NavLink>
-          <NavLink to="/packages" onClick={() => setOpen(false)}>
+          <NavLink to="/packages" onClick={close}>
             {t('nav.packages')}
           </NavLink>
-          <NavLink to="/for-organizations" onClick={() => setOpen(false)}>
+          <NavLink to="/for-organizations" onClick={close}>
             {t('nav.organizations')}
           </NavLink>
-          <NavLink to="/blog" onClick={() => setOpen(false)}>
+          <NavLink to="/sample-certificate" onClick={close}>
+            Certificate
+          </NavLink>
+          <NavLink to="/blog" onClick={close}>
             {t('nav.blog')}
           </NavLink>
-          <NavLink to="/faq" onClick={() => setOpen(false)}>
+          <NavLink to="/faq" onClick={close}>
             {t('nav.faq')}
           </NavLink>
           <div className="lang-toggle" role="group" aria-label={t('common.language')}>
@@ -62,7 +69,7 @@ export function Header() {
               TR
             </button>
           </div>
-          <Link to="/age-groups" className="btn btn-primary nav-cta" onClick={() => setOpen(false)}>
+          <Link to="/iq-test" className="btn btn-primary nav-cta" onClick={close}>
             {t('nav.startTest')}
           </Link>
         </nav>

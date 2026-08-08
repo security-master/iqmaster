@@ -30,7 +30,13 @@ export function buildShareText(details: Pick<ShareDetails, 'iq' | 'band'>): stri
 export function getShareUrl(): string {
   if (typeof window === 'undefined') return ''
 
-  return window.location.origin || window.location.href
+  const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
+  const origin = window.location.origin
+  // Prefer current page URL when already on results; otherwise site root with GH Pages base.
+  if (window.location.pathname.includes('/iq-test/') && window.location.pathname.includes('/results')) {
+    return window.location.href.split('?')[0]
+  }
+  return `${origin}${base || ''}/`
 }
 
 export function canUseNativeShare(): boolean {
@@ -83,10 +89,7 @@ export async function shareResult(details: ShareDetails): Promise<NativeShareSta
     })
     return 'shared'
   } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') {
-      return 'dismissed'
-    }
-
+    if (error instanceof DOMException && error.name === 'AbortError') return 'dismissed'
     return 'unavailable'
   }
 }

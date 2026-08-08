@@ -82,7 +82,7 @@ export function Home() {
             <Link to="/iq-test" className="btn btn-primary">
               {t('home.hero.ctaPrimary')}
             </Link>
-            <Link to="/age-groups" className="btn btn-ghost">
+            <Link to="/age-groups" className="btn btn-secondary">
               {t('home.hero.ctaSecondary')}
             </Link>
           </div>

@@ -9,12 +9,21 @@ const KEY = 'iqmaster.branding.v1'
 
 const DEFAULTS: OrgBranding = {
   organizationName: 'IQMaster',
-  primaryColor: '#0e7490',
-  accentColor: '#14b8a6',
+  primaryColor: '#1f4b7a',
+  accentColor: '#9a7b4f',
   logoText: 'IQMaster',
 }
 
-const LEGACY_PURPLES = new Set(['#5b21b6', '#7c3aed', '#3b0764', '#4c1d95', '#6d28d9'])
+const LEGACY_PURPLES = new Set([
+  '#5b21b6',
+  '#7c3aed',
+  '#3b0764',
+  '#4c1d95',
+  '#6d28d9',
+  '#0e7490',
+  '#14b8a6',
+  '#083344',
+])
 
 export function getBranding(): OrgBranding {
   try {
