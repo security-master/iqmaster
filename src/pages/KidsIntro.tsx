@@ -3,7 +3,7 @@ import { MatrixSvg } from '../components/PuzzleSvg'
 import { KIDS_TEST_BANK } from '../data/test-banks/kids'
 import { AGE_BANDS } from '../lib/test-catalog'
 
-export const KIDS_TEST_ROUTE_SUGGESTION = '/kids-test'
+const KIDS_TEST_ROUTE_SUGGESTION = '/kids-test'
 
 const kidsBand = AGE_BANDS.find((band) => band.id === 'kids') ?? AGE_BANDS[0]
 const previewItem = KIDS_TEST_BANK[0]

@@ -3,12 +3,6 @@ import { Link } from 'react-router-dom'
 import { CellSvg } from '../components/PuzzleSvg'
 import { AGE_BANDS, TEST_BANKS_BY_AGE, type AgeBand } from '../lib/test-catalog'
 
-export const AGE_SELECT_ROUTE_SUGGESTIONS = [
-  { path: '/age-groups', component: 'AgeSelect' },
-  { path: '/kids-intro', component: 'KidsIntro' },
-  { path: '/iq-test', component: 'TestStart', ageBand: 'adult' },
-] as const
-
 function bandPreviewCells(band: AgeBand) {
   if (band.id === 'kids') return TEST_BANKS_BY_AGE.kids[0]?.matrix
   if (band.id === 'teens') return TEST_BANKS_BY_AGE.teens[0]?.matrix
