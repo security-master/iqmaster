@@ -1,8 +1,13 @@
 import { Link } from 'react-router-dom'
+import { Seo } from '../components/Seo'
 
 export function Pricing() {
   return (
     <div className="container page-hero">
+      <Seo
+        title="Pricing — IQMaster IQ Test Results"
+        description="Take the full 30-question IQ test free. Unlock your score, percentile, analysis, and printable certificate for one flat price — no subscription."
+      />
       <p className="eyebrow">Pricing</p>
       <h1>One price. Full unlock.</h1>
       <p>

@@ -7,6 +7,16 @@ export interface ReportDetails {
   percentile: number
   testId: string
   generatedAt?: Date
+  accuracy?: number
+  answered?: number
+  questionTotal?: number
+  confidenceNote?: string
+  uncertainty?: string
+  integrityNote?: string
+  abilityProfile?: Array<{ label: string; score: number; note: string }>
+  track?: string
+  completionMode?: string
+  portableCode?: string
 }
 
 export interface ReportFileOptions {
@@ -290,12 +300,54 @@ export function buildReportHtml(report: ReportDetails): string {
         </div>
       </section>
 
+      <section class="detail-card" aria-label="Assessment details" style="margin-bottom:24px">
+        <div class="detail-label">Assessment profile</div>
+        <div class="detail-list">
+          <div>
+            <p class="detail-label">Track / completion</p>
+            <p class="detail-value">${escapeHtml(report.track ?? 'adult')} · ${escapeHtml(report.completionMode ?? 'full')}</p>
+          </div>
+          <div>
+            <p class="detail-label">Accuracy</p>
+            <p class="detail-value">${report.accuracy ?? '—'}% (${report.answered ?? '—'}/${report.questionTotal ?? '—'})</p>
+          </div>
+          <div>
+            <p class="detail-label">Confidence</p>
+            <p class="detail-value">${escapeHtml(report.confidenceNote ?? 'Standard entertainment confidence')}</p>
+          </div>
+        </div>
+      </section>
+
+      ${
+        report.abilityProfile?.length
+          ? `<section class="detail-card" aria-label="Ability profile" style="margin-bottom:24px">
+        <div class="detail-label">Ability profile</div>
+        <div class="detail-list">
+          ${report.abilityProfile
+            .map(
+              (item) => `<div>
+              <p class="detail-label">${escapeHtml(item.label)} · ${item.score}</p>
+              <p>${escapeHtml(item.note)}</p>
+            </div>`,
+            )
+            .join('')}
+        </div>
+      </section>`
+          : ''
+      }
+
       <section class="note" aria-label="Interpretation note">
         <p>
           A score in the <strong>${safeBand}</strong> band indicates how this performance compares
-          with IQMaster's reference scoring model. Repeating the assessment in a quiet setting can
-          improve consistency for timed visual reasoning tasks.
+          with IQMaster's reference scoring model. ${escapeHtml(report.uncertainty ?? '')}
+          ${report.integrityNote ? ` ${escapeHtml(report.integrityNote)}` : ''}
+          Repeating the assessment in a quiet setting can improve consistency for timed visual reasoning tasks.
         </p>
+        ${
+          report.portableCode
+            ? `<p style="margin-top:12px"><strong>Recovery code:</strong> <code style="word-break:break-all">${escapeHtml(report.portableCode)}</code></p>`
+            : ''
+        }
       </section>
     </main>
 

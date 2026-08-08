@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
+import { useI18n } from '../i18n/I18nContext'
 
 export function Header() {
   const [open, setOpen] = useState(false)
+  const { lang, setLang, t } = useI18n()
 
   return (
     <header className="site-header">
@@ -27,25 +29,44 @@ export function Header() {
 
         <nav className={`nav ${open ? 'open' : ''}`}>
           <NavLink to="/progress" onClick={() => setOpen(false)}>
-            Progress
+            {t('nav.progress')}
           </NavLink>
           <NavLink to="/age-groups" onClick={() => setOpen(false)}>
-            Age Groups
+            {t('nav.ageGroups')}
           </NavLink>
           <NavLink to="/packages" onClick={() => setOpen(false)}>
-            Packages
+            {t('nav.packages')}
           </NavLink>
           <NavLink to="/for-organizations" onClick={() => setOpen(false)}>
-            Organizations
+            {t('nav.organizations')}
           </NavLink>
           <NavLink to="/blog" onClick={() => setOpen(false)}>
-            Blog
+            {t('nav.blog')}
           </NavLink>
           <NavLink to="/faq" onClick={() => setOpen(false)}>
-            FAQ
+            {t('nav.faq')}
           </NavLink>
+          <div className="lang-toggle" role="group" aria-label={t('common.language')}>
+            <button
+              type="button"
+              className={lang === 'en' ? 'active' : undefined}
+              aria-pressed={lang === 'en'}
+              onClick={() => setLang('en')}
+            >
+              EN
+            </button>
+            <span aria-hidden="true">|</span>
+            <button
+              type="button"
+              className={lang === 'tr' ? 'active' : undefined}
+              aria-pressed={lang === 'tr'}
+              onClick={() => setLang('tr')}
+            >
+              TR
+            </button>
+          </div>
           <Link to="/age-groups" className="btn btn-primary nav-cta" onClick={() => setOpen(false)}>
-            Start IQ Test
+            {t('nav.startTest')}
           </Link>
         </nav>
       </div>

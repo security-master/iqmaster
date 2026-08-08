@@ -2,20 +2,28 @@
 
 A modern, culture-fair online IQ test experience — inspired by classic certificate funnels, rebuilt with transparent pricing and calmer UX.
 
+## Live site
+
+- **Production:** https://security-master.github.io/iqmaster/
+- Local: http://127.0.0.1:5173
+
 ## Stack
 
-- Vite + React + TypeScript
-- React Router
-- Cloudflare Pages (+ Pages Functions)
-- Local session storage for demo unlock flow
+- Vite + React + TypeScript + React Router
+- GitHub Pages hosting
+- Optional Supabase (results sync, contact inbox, org invites)
+- Local session / credits when cloud is not configured
 
 ## Features
 
-- Landing, About, FAQ, Blog, Pricing, Contact
-- 30 original SVG matrix questions (6 options each)
-- Timed test with reviewable answers
-- Profile capture → demo checkout ($19) → scored results + printable certificate
-- Display Results via Test ID + security code
+- Landing, About, FAQ, Blog (SEO articles), Pricing, Contact
+- Age tracks: kids / teens / adult
+- 30 visual matrix questions, early finish, integrity checks
+- Demo unlock (Stripe later) or organization credit unlock
+- Ability profile, richer printable report, social share
+- Portable recovery codes + Display Results reopen
+- Org dashboard: invites, participants, white-label colors, webhook
+- TR/EN language toggle
 
 ## Develop
 
@@ -24,52 +32,28 @@ npm install
 npm run dev
 ```
 
-## Build
+## Optional cloud setup (recommended)
+
+1. Create a free Supabase project
+2. Run SQL from `supabase/schema.sql` in the Supabase SQL Editor
+3. Add GitHub Actions secrets (or local `.env`):
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_CONTACT_TO_EMAIL` (optional FormSubmit fallback)
+4. Redeploy GitHub Pages
+
+Without Supabase, the app still works with localStorage + recovery codes.
+
+## Build / deploy
 
 ```bash
 npm run build
-npm run preview
 ```
 
-## Deploy (Cloudflare Pages)
+Push to `main` → **Deploy GitHub Pages** workflow.
 
-### Option A — GitHub Actions (recommended)
-
-1. Create a Cloudflare API token with **Cloudflare Pages: Edit**
-2. Add repo secrets:
-   - `CLOUDFLARE_API_TOKEN`
-   - `CLOUDFLARE_ACCOUNT_ID`
-3. Push to `main` (or run the **Deploy Cloudflare Pages** workflow)
-
-### Option B — Wrangler CLI
-
-```bash
-npm run build
-npx wrangler pages deploy dist --project-name=iqmaster
-```
-
-### Option C — Cloudflare dashboard Git integration
-
-Connect `security-master/iqmaster` in Workers & Pages → Create → Connect to Git.
-
-- Build command: `npm run build`
-- Output directory: `dist`
-- Framework preset: Vite
+For GitHub Pages path hosting, CI sets `GITHUB_PAGES=true` (base `/iqmaster/`).
 
 ## Note
 
-Scores are entertainment/education estimates, not clinical diagnoses.
-
-## Live site
-
-- **Production:** https://security-master.github.io/iqmaster/
-- Local: http://127.0.0.1:5173
-
-GitHub Pages is deployed automatically from `main` via **Deploy GitHub Pages**.
-
-```bash
-npm run build
-rm -f dist/_redirects
-npx wrangler deploy --temporary --config wrangler.preview.toml
-```
-
+Scores are entertainment/education estimates, not clinical diagnoses. Stripe is not connected yet.

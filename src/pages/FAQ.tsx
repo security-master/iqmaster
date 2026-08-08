@@ -25,9 +25,15 @@ const FAQS = [
   },
 ]
 
+import { Seo } from '../components/Seo'
+
 export function FAQ() {
   return (
     <div className="page-shell">
+      <Seo
+        title="FAQ — IQMaster Online IQ Test"
+        description="Answers about IQMaster test length, timing, culture-fair design, pricing, certificates, and how to retrieve your results later."
+      />
       <section className="container page-hero page-hero-card">
         <p className="eyebrow">IQMaster FAQ</p>
         <h1>Answers before you start your IQ test</h1>

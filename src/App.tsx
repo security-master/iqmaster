@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { I18nProvider } from './i18n/I18nContext'
 import { Layout } from './components/Layout'
 import { About } from './pages/About'
 import { Blog } from './pages/Blog'
@@ -23,13 +24,15 @@ import { TestQuestion } from './pages/TestQuestion'
 import { TestResults } from './pages/TestResults'
 import { ProgressBoard } from './pages/ProgressBoard'
 import { TestStart } from './pages/TestStart'
+import { JoinInvite } from './pages/JoinInvite'
 
 const routerBasename = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') || '/'
 
 export default function App() {
   return (
-    <BrowserRouter basename={routerBasename === '/' ? undefined : routerBasename}>
-      <Routes>
+    <I18nProvider>
+      <BrowserRouter basename={routerBasename === '/' ? undefined : routerBasename}>
+        <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="progress" element={<ProgressBoard />} />
@@ -47,6 +50,7 @@ export default function App() {
           <Route path="sample-certificate" element={<SampleCertificate />} />
           <Route path="sample-report" element={<SampleReport />} />
           <Route path="display-results" element={<DisplayResults />} />
+          <Route path="join/:token" element={<JoinInvite />} />
           <Route path="age-groups" element={<AgeSelect />} />
           <Route path="kids-intro" element={<KidsIntro />} />
           <Route path="kids-test" element={<Navigate to="/iq-test?track=kids" replace />} />
@@ -57,7 +61,8 @@ export default function App() {
           <Route path="iq-test/:testId/:number" element={<TestQuestion />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </I18nProvider>
   )
 }

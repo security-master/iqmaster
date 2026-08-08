@@ -121,7 +121,10 @@ export function completeProfile(
   session.completionMode = completionModeFor(answeredCount, total)
   session.finishedAt = session.finishedAt ?? new Date().toISOString()
   const correct = countCorrectForTrack(session.answers, session.track)
-  session.result = scoreAnswers(correct, answeredCount, profile.age, total)
+  session.result = scoreAnswers(correct, answeredCount, profile.age, total, {
+    elapsedSeconds: session.elapsedSeconds,
+    answers: session.answers,
+  })
   saveSession(session)
   return session
 }

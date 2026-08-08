@@ -1,8 +1,13 @@
 import { Link } from 'react-router-dom'
+import { Seo } from '../components/Seo'
 
 export function About() {
   return (
     <div className="page-shell">
+      <Seo
+        title="About IQMaster — Online IQ Testing"
+        description="Learn how IQMaster delivers culture-fair matrix testing, clear score reports, and printable certificates with transparent pricing."
+      />
       <section className="container page-hero page-hero-card">
         <p className="eyebrow">About IQMaster</p>
         <h1>Online IQ testing with a certificate-first experience</h1>

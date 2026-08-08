@@ -21,6 +21,7 @@ export async function onRequestPost(context: { request: Request }): Promise<Resp
   }
 
   const correct = QUESTIONS.reduce((sum, q, i) => sum + (answers[i] === q.answer ? 1 : 0), 0)
-  const result = scoreAnswers(correct, QUESTIONS.length, age)
+  const answered = answers.filter((a) => a !== null).length
+  const result = scoreAnswers(correct, answered, age, QUESTIONS.length, { answers })
   return Response.json({ result })
 }

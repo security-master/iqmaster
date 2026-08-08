@@ -2,13 +2,7 @@ import type { CSSProperties } from 'react'
 import { downloadReportHtml, printReportPdf, type ReportDetails } from '../lib/report/pdf'
 import { ShareButtons } from './ShareButtons'
 
-export interface ReportActionsProps {
-  name: string
-  iq: number
-  band: string
-  percentile: number
-  testId: string
-}
+export type ReportActionsProps = ReportDetails
 
 const actionsStyle = {
   display: 'grid',
@@ -27,8 +21,8 @@ const buttonRowStyle = {
   alignItems: 'center',
 } satisfies CSSProperties
 
-export function ReportActions({ name, iq, band, percentile, testId }: ReportActionsProps) {
-  const report: ReportDetails = { name, iq, band, percentile, testId }
+export function ReportActions(props: ReportActionsProps) {
+  const report: ReportDetails = props
 
   function onPrintReport() {
     if (!printReportPdf(report)) {
@@ -48,7 +42,8 @@ export function ReportActions({ name, iq, band, percentile, testId }: ReportActi
           Download and share
         </h2>
         <p style={{ marginTop: '0.55rem' }}>
-          Open a print-ready report for saving as PDF, or download the same styled report as an HTML fallback.
+          Open a print-ready evaluation report (ability profile, confidence, integrity notes) for PDF
+          save, or download the HTML fallback.
         </p>
       </div>
 
@@ -71,7 +66,13 @@ export function ReportActions({ name, iq, band, percentile, testId }: ReportActi
         </button>
       </div>
 
-      <ShareButtons name={name} iq={iq} band={band} percentile={percentile} testId={testId} />
+      <ShareButtons
+        name={props.name}
+        iq={props.iq}
+        band={props.band}
+        percentile={props.percentile}
+        testId={props.testId}
+      />
     </section>
   )
 }

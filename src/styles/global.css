@@ -241,6 +241,35 @@ p {
   margin-left: 0.35rem;
 }
 
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--slate);
+}
+
+.lang-toggle button {
+  background: transparent;
+  border: none;
+  padding: 0.15rem 0.25rem;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+.lang-toggle button.active {
+  color: var(--ink);
+  opacity: 1;
+}
+
+.lang-toggle span {
+  opacity: 0.35;
+  user-select: none;
+}
+
 .menu-toggle {
   display: none;
   background: transparent;

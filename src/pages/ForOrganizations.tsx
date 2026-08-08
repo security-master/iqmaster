@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { Seo } from '../components/Seo'
 
 const orgUseCases = [
   {
@@ -37,6 +38,10 @@ const roles = [
 export function ForOrganizations() {
   return (
     <div className="container page-hero">
+      <Seo
+        title="For Organizations — IQMaster Assessment Credits"
+        description="Prepaid IQ test credits for families, classrooms, coaches, and HR teams. Free starts, shared balance, and report unlocks for groups."
+      />
       <p className="eyebrow">For organizations</p>
       <h1>Assessment credits for groups that test more than one person.</h1>
       <p>

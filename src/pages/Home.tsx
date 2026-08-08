@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { Seo } from '../components/Seo'
+import { useI18n } from '../i18n/I18nContext'
 import { asset } from '../lib/asset'
 
 const abilities = [
@@ -53,8 +55,14 @@ const testimonials = [
 ]
 
 export function Home() {
+  const { t } = useI18n()
+
   return (
     <>
+      <Seo
+        title="IQMaster — Online IQ Test & Certificate"
+        description="Take a culture-fair 30-question IQ test online. Get your score, percentile, analysis, and printable certificate with transparent pricing."
+      />
       <div className="progress-banner">
         <div className="container progress-banner__inner">
           <span>Platform v1 ilerleme: 100% — tüm iş akışları tamam</span>
@@ -74,21 +82,18 @@ export function Home() {
           />
         </div>
         <div className="container hero-content hero-content--photo">
-          <p className="hero-brand">IQMaster</p>
-          <h1 className="hero-title">Discover your cognitive potential</h1>
-          <p className="hero-copy">
-            A professional, culture-fair IQ assessment with a clear score, PDF report, and shareable
-            certificate.
-          </p>
+          <p className="hero-brand">{t('home.hero.brand')}</p>
+          <h1 className="hero-title">{t('home.hero.title')}</h1>
+          <p className="hero-copy">{t('home.hero.lead')}</p>
           <div className="hero-actions">
             <Link to="/iq-test" className="btn btn-primary">
-              Find Your IQ Score
+              {t('home.hero.ctaPrimary')}
             </Link>
             <Link to="/age-groups" className="btn btn-secondary">
-              Choose age group
+              {t('home.hero.ctaSecondary')}
             </Link>
           </div>
-          <p className="hero-meta">30 visual questions · about 20–40 minutes · report unlock $19</p>
+          <p className="hero-meta">{t('home.hero.meta')}</p>
         </div>
       </section>
 
