@@ -26,9 +26,9 @@ export function Header() {
         </button>
 
         <nav className={`nav ${open ? 'open' : ''}`}>
-          <a href="/#how-it-works" onClick={() => setOpen(false)}>
-            How It Works
-          </a>
+          <NavLink to="/progress" onClick={() => setOpen(false)}>
+            Progress
+          </NavLink>
           <NavLink to="/age-groups" onClick={() => setOpen(false)}>
             Age Groups
           </NavLink>
