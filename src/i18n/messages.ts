@@ -11,9 +11,13 @@ export const messages: Record<'en' | 'tr', MessageTree> = {
       ageGroups: 'Age Groups',
       packages: 'Packages',
       organizations: 'Organizations',
+      certificate: 'Certificate',
       blog: 'Blog',
       faq: 'FAQ',
-      startTest: 'Begin Assessment',
+      startTest: 'Start Test',
+      tagline: 'IQ Assessment',
+      menu: 'Menu',
+      close: 'Close',
     },
     home: {
       hero: {
@@ -44,9 +48,13 @@ export const messages: Record<'en' | 'tr', MessageTree> = {
       ageGroups: 'Yaş Grupları',
       packages: 'Paketler',
       organizations: 'Kurumlar',
+      certificate: 'Sertifika',
       blog: 'Blog',
       faq: 'SSS',
-      startTest: 'Değerlendirmeyi Başlat',
+      startTest: 'Teste Başla',
+      tagline: 'IQ Değerlendirme',
+      menu: 'Menü',
+      close: 'Kapat',
     },
     home: {
       hero: {
