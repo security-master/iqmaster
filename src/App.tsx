@@ -11,6 +11,10 @@ import { IqScore } from './pages/IqScore'
 import { Pricing } from './pages/Pricing'
 import { SampleCertificate } from './pages/SampleCertificate'
 import { SampleReport } from './pages/SampleReport'
+import { ForOrganizations } from './pages/ForOrganizations'
+import { Packages } from './pages/Packages'
+import { CreditHistory } from './pages/dashboard/CreditHistory'
+import { OrgDashboard } from './pages/dashboard/OrgDashboard'
 import { TestComplete } from './pages/TestComplete'
 import { TestPayment } from './pages/TestPayment'
 import { TestQuestion } from './pages/TestQuestion'
@@ -26,6 +30,10 @@ export default function App() {
           <Route path="about" element={<About />} />
           <Route path="faq" element={<FAQ />} />
           <Route path="pricing" element={<Pricing />} />
+          <Route path="packages" element={<Packages />} />
+          <Route path="for-organizations" element={<ForOrganizations />} />
+          <Route path="dashboard/org" element={<OrgDashboard />} />
+          <Route path="dashboard/credits" element={<CreditHistory />} />
           <Route path="contact" element={<Contact />} />
           <Route path="blog" element={<Blog />} />
           <Route path="blog/:slug" element={<BlogPost />} />
