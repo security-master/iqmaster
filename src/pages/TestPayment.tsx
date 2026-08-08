@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { useI18n } from '../i18n/I18nContext'
 import { consumeAssessmentCredit, getCreditSummary } from '../lib/billing/credits'
 import { getSession, unlockSession } from '../lib/session'
 import { syncSessionRemote } from '../lib/sync'
@@ -11,6 +12,7 @@ export function TestPayment() {
   const [busy, setBusy] = useState(false)
   const [note, setNote] = useState('')
   const credits = getCreditSummary().remainingCredits
+  const { t } = useI18n()
 
   if (!session) return <Navigate to="/iq-test" replace />
   if (!session.profile || !session.result) {
@@ -25,10 +27,10 @@ export function TestPayment() {
       if (mode === 'credit') {
         const entry = consumeAssessmentCredit(session!.profile?.name ?? 'Member')
         if (!entry) {
-          setNote('No organization credits left. Buy a package or use demo unlock.')
+          setNote(t('test.payment.noCredits'))
           return
         }
-        setNote(`${entry.note}. Remaining credits: ${entry.balanceAfter}`)
+        setNote(t('test.payment.creditNote', { note: entry.note, remaining: entry.balanceAfter }))
       } else {
         await new Promise((r) => setTimeout(r, 500))
       }
@@ -42,30 +44,30 @@ export function TestPayment() {
 
   return (
     <div className="container test-shell">
-      <p className="eyebrow">Checkout</p>
-      <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>Your IQ test is submitted</h1>
-      <p style={{ marginTop: '0.8rem' }}>
-        Unlock the full package for a flat <strong>$19</strong> (Stripe coming later). Demo unlock or
-        organization credits work now.
-      </p>
+      <p className="eyebrow">{t('test.payment.eyebrow')}</p>
+      <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>{t('test.payment.title')}</h1>
+      <p style={{ marginTop: '0.8rem' }}>{t('test.payment.lead')}</p>
 
       <div className="split" style={{ marginTop: '2rem' }}>
         <div className="price-box">
           <div className="muted" style={{ fontWeight: 700 }}>
-            Order summary
+            {t('test.payment.order')}
           </div>
           <p style={{ marginTop: '0.6rem' }}>
-            Test ID: <strong>{testId}</strong>
+            {t('test.payment.testId')} <strong>{testId}</strong>
           </p>
           <div className="price">$19</div>
           <ul className="checklist">
-            <li>IQ score evaluation + ability profile</li>
+            <li>{t('test.payment.bullet1')}</li>
             <li>
-              Answered items scored: {session.result.answered}/{session.result.questionTotal}
+              {t('test.payment.bullet2', {
+                answered: session.result.answered,
+                total: session.result.questionTotal,
+              })}
             </li>
-            <li>Integrity review + confidence notes</li>
-            <li>Printable certificate + recovery code</li>
-            <li>Cross-device reopen when Supabase is configured</li>
+            <li>{t('test.payment.bullet3')}</li>
+            <li>{t('test.payment.bullet4')}</li>
+            <li>{t('test.payment.bullet5')}</li>
           </ul>
           <button
             className="btn btn-primary"
@@ -73,7 +75,7 @@ export function TestPayment() {
             disabled={busy}
             onClick={() => unlock('demo')}
           >
-            {busy ? 'Processing…' : 'Place order — demo unlock'}
+            {busy ? t('test.payment.processing') : t('test.payment.demo')}
           </button>
           <button
             className="btn btn-secondary"
@@ -81,7 +83,7 @@ export function TestPayment() {
             disabled={busy || credits < 1}
             onClick={() => unlock('credit')}
           >
-            Unlock with org credit ({credits} left)
+            {t('test.payment.credit', { credits })}
           </button>
           {note && (
             <p className="notice" style={{ marginTop: '0.8rem' }}>
@@ -89,17 +91,13 @@ export function TestPayment() {
             </p>
           )}
           <p className="muted" style={{ marginTop: '0.8rem', fontSize: '0.9rem' }}>
-            Stripe is not connected yet. Demo unlock and organization credits are available.
+            {t('test.payment.stripeNote')}
           </p>
         </div>
         <div className="prose">
-          <h2>What happens next</h2>
-          <p>
-            After unlock you will see your IQ, band, percentile, ability profile, and certificate. Save
-            your security code <strong>{session.securityCode}</strong> (and recovery code on the
-            results page) to reopen later.
-          </p>
-          <div className="notice">Security code: {session.securityCode}</div>
+          <h2>{t('test.payment.nextTitle')}</h2>
+          <p>{t('test.payment.nextLead', { code: session.securityCode })}</p>
+          <div className="notice">{t('test.payment.securityCode', { code: session.securityCode })}</div>
         </div>
       </div>
     </div>

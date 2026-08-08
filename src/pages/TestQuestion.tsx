@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { CellSvg, MatrixSvg } from '../components/PuzzleSvg'
+import { useI18n } from '../i18n/I18nContext'
 import { getQuestionsForTrack } from '../lib/banks'
 import { countAnswered, finishSession, formatElapsed, getSession, setAnswer, updateElapsed } from '../lib/session'
 
 export function TestQuestion() {
   const { testId = '', number = '1' } = useParams()
   const navigate = useNavigate()
+  const { t } = useI18n()
   const index = Number(number) - 1
   const session = getSession(testId)
   const questions = useMemo(
@@ -52,13 +54,16 @@ export function TestQuestion() {
     if (!latestSession) return
     const currentAnsweredCount = countAnswered(latestSession.answers)
     if (currentAnsweredCount < 1) {
-      window.alert('Answer at least one question before finishing. For a reliable IQ estimate, answer 8 or more.')
+      window.alert(t('test.question.needOne'))
       return
     }
     if (
       currentAnsweredCount < 8 &&
       !window.confirm(
-        `You have answered ${currentAnsweredCount} of ${questions.length} items. Finish now with a low-confidence provisional score?`,
+        t('test.question.earlyConfirm', {
+          answered: currentAnsweredCount,
+          total: questions.length,
+        }),
       )
     ) {
       return
@@ -74,21 +79,19 @@ export function TestQuestion() {
     <div className="container test-shell">
       <div className="test-topbar">
         <div>
-          Your Test ID: <strong>{testId}</strong> · {session.track}
+          {t('test.question.testId')} <strong>{testId}</strong> · {session.track}
         </div>
-        <div>
-          Question {index + 1}/{questions.length}
-        </div>
+        <div>{t('test.question.questionOf', { current: index + 1, total: questions.length })}</div>
         <div aria-live="polite">{formatElapsed(elapsed)}</div>
       </div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '1rem 0' }}>
         <button type="button" className="btn btn-primary" onClick={finishNow}>
-          Finish test now
+          {t('test.question.finishNow')}
         </button>
       </div>
 
       <div className="test-panel">
-        <p className="eyebrow">Matrix item</p>
+        <p className="eyebrow">{t('test.question.matrixItem')}</p>
         <h2 style={{ fontSize: '1.45rem', marginTop: '0.4rem' }}>{question.prompt}</h2>
 
         <div className="puzzle-stage">
@@ -139,12 +142,12 @@ export function TestQuestion() {
               style={{ marginLeft: '0.5rem' }}
               onClick={finishNow}
             >
-              Finish
+              {t('test.question.finish')}
             </button>
           )}
         </div>
         <p className="muted" style={{ marginTop: '0.85rem', fontSize: '0.92rem' }}>
-          Answered {answeredCount} of {questions.length} — you can revisit any item before finishing.
+          {t('test.question.answeredHint', { answered: answeredCount, total: questions.length })}
         </p>
       </div>
     </div>

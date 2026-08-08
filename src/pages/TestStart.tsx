@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useI18n } from '../i18n/I18nContext'
 import { getQuestionsForTrack, parseTrack } from '../lib/banks'
 import { createSession } from '../lib/session'
 
@@ -9,9 +10,11 @@ export function TestStart() {
   const track = parseTrack(params.get('track'))
   const questions = getQuestionsForTrack(track)
   const [accepted, setAccepted] = useState(false)
+  const { t } = useI18n()
 
-  const title =
-    track === 'kids' ? 'Kids visual test' : track === 'teens' ? 'Teens visual test' : 'Adult IQ test'
+  const titleKey =
+    track === 'kids' ? 'test.start.titleKids' : track === 'teens' ? 'test.start.titleTeens' : 'test.start.titleAdult'
+  const title = t(titleKey)
 
   function start() {
     const session = createSession(track)
@@ -20,23 +23,21 @@ export function TestStart() {
 
   return (
     <div className="container test-shell">
-      <p className="eyebrow">IQMaster assessment · {track}</p>
-      <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.4rem)', maxWidth: '16ch' }}>
-        Ready to start the {title}?
+      <p className="eyebrow">{t('test.start.eyebrow', { track })}</p>
+      <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.4rem)', maxWidth: '18ch' }}>
+        {t('test.start.heading', { title })}
       </h1>
       <p style={{ marginTop: '1rem', maxWidth: '58ch' }}>
-        Find a quiet place, close extra tabs, and silence notifications. This track has{' '}
-        {questions.length} visual pattern questions. Maximum time: 60 minutes. You can move back and
-        forth, or finish early for a confidence-adjusted score.
+        {t('test.start.lead', { count: questions.length })}
       </p>
 
       <div className="price-box" style={{ marginTop: '1.75rem' }}>
-        <h3>Before you begin</h3>
+        <h3>{t('test.start.before')}</h3>
         <ul className="checklist">
-          <li>Visual-only items — no number puzzles</li>
-          <li>One best answer per matrix</li>
-          <li>Taking the test is free — full report unlock is $19 (or 1 org credit)</li>
-          <li>You will receive a Test ID and security code</li>
+          <li>{t('test.start.bullet1')}</li>
+          <li>{t('test.start.bullet2')}</li>
+          <li>{t('test.start.bullet3')}</li>
+          <li>{t('test.start.bullet4')}</li>
         </ul>
       </div>
 
@@ -56,16 +57,15 @@ export function TestStart() {
           onChange={(e) => setAccepted(e.target.checked)}
           style={{ marginTop: '0.3rem' }}
         />
-        I understand this is an entertainment/education assessment, not a clinical evaluation, and I
-        accept the testing guidelines.
+        {t('test.start.accept')}
       </label>
 
       <div className="hero-actions" style={{ marginTop: '1.5rem' }}>
         <button className="btn btn-primary" disabled={!accepted} onClick={start}>
-          Yes, I&apos;m ready — start
+          {t('test.start.cta')}
         </button>
         <Link to="/age-groups" className="btn btn-secondary">
-          Change age group
+          {t('test.start.changeAge')}
         </Link>
       </div>
     </div>

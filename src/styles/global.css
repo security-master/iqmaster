@@ -1,35 +1,35 @@
 :root {
-  --ink: #f3f5f8;
-  --slate: #c2c8d2;
-  --muted: #9aa3b2;
-  --mist: #1c2330;
-  --paper: #0c0f14;
-  --surface: #151a22;
-  --teal: #c9a76a;
-  --teal-deep: #dfc08a;
-  --teal-soft: rgba(201, 167, 106, 0.14);
-  --amber: #c9a76a;
-  --amber-soft: rgba(201, 167, 106, 0.12);
-  --line: rgba(243, 245, 248, 0.12);
-  --shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+  --ink: #142033;
+  --slate: #3d4656;
+  --muted: #667084;
+  --mist: #eef2f7;
+  --paper: #f5f1ea;
+  --surface: #ffffff;
+  --teal: #8d6b35;
+  --teal-deep: #6f5228;
+  --teal-soft: rgba(168, 132, 69, 0.12);
+  --amber: #a88445;
+  --amber-soft: rgba(168, 132, 69, 0.14);
+  --line: rgba(20, 32, 51, 0.1);
+  --shadow: 0 22px 50px rgba(20, 32, 51, 0.1);
   --radius: 12px;
   --font-display: "Cormorant Garamond", "Times New Roman", serif;
   --font-body: "Figtree", system-ui, sans-serif;
   --max: 1120px;
-  --primary: #c9a76a;
-  --primary-2: #d8b97f;
-  --primary-3: #e4c892;
-  --primary-deep: #f0dfa8;
-  --primary-soft: rgba(201, 167, 106, 0.14);
-  --signal: #c9a76a;
-  --gold: #c9a76a;
+  --primary: #a88445;
+  --primary-2: #c4a46a;
+  --primary-3: #d8b97f;
+  --primary-deep: #6f5228;
+  --primary-soft: rgba(168, 132, 69, 0.14);
+  --signal: #8d6b35;
+  --gold: #c4a46a;
   color: var(--ink);
   background: var(--paper);
   font-family: var(--font-body);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 *,
@@ -46,9 +46,9 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(1000px 480px at 12% -8%, rgba(201, 167, 106, 0.1), transparent 55%),
-    radial-gradient(900px 420px at 90% 0%, rgba(70, 110, 160, 0.12), transparent 50%),
-    linear-gradient(180deg, #10141c 0%, var(--paper) 42%, #090b10 100%);
+    radial-gradient(1000px 520px at 10% -12%, rgba(196, 164, 106, 0.22), transparent 55%),
+    radial-gradient(900px 460px at 92% 0%, rgba(90, 130, 180, 0.14), transparent 52%),
+    linear-gradient(180deg, #fbf8f2 0%, var(--paper) 40%, #ebe4d8 100%);
   color: var(--ink);
 }
 
@@ -57,10 +57,10 @@ body::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: 0.18;
+  opacity: 0.28;
   background-image:
-    linear-gradient(rgba(243, 245, 248, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(243, 245, 248, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(20, 32, 51, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 32, 51, 0.035) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: linear-gradient(180deg, #000 0%, transparent 78%);
   z-index: 0;
@@ -150,7 +150,9 @@ p {
 }
 
 .btn-secondary:hover {
-  background: rgba(243, 245, 248, 0.06);
+  background: rgba(168, 132, 69, 0.12);
+  color: var(--ink);
+  border-color: rgba(168, 132, 69, 0.4);
 }
 
 .btn-ghost {
@@ -196,8 +198,8 @@ p {
   top: 0;
   z-index: 50;
   backdrop-filter: blur(18px);
-  background: rgba(12, 15, 20, 0.88);
-  border-bottom: 1px solid rgba(243, 245, 248, 0.08);
+  background: rgba(251, 248, 242, 0.9);
+  border-bottom: 1px solid var(--line);
 }
 
 .header-inner {
@@ -278,7 +280,7 @@ p {
 
 .nav a:hover,
 .nav a.active {
-  color: #fff;
+  color: var(--ink);
 }
 
 .nav a.btn,
@@ -300,9 +302,9 @@ p {
   align-items: center;
   gap: 0.35rem;
   padding: 0.2rem;
-  border: 1px solid rgba(243, 245, 248, 0.12);
+  border: 1px solid var(--line);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(20, 32, 51, 0.03);
 }
 
 .lang-toggle button {
@@ -322,8 +324,8 @@ p {
 }
 
 .lang-toggle button.active {
-  background: rgba(201, 167, 106, 0.18);
-  color: #fff;
+  background: rgba(168, 132, 69, 0.18);
+  color: var(--ink);
 }
 
 .lang-flag {
@@ -335,12 +337,12 @@ p {
 }
 
 .brand-text strong {
-  color: #fff;
+  color: var(--ink);
 }
 
 .menu-toggle {
   display: none;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(20, 32, 51, 0.04);
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 0.55rem 0.85rem;
@@ -351,7 +353,7 @@ p {
 .site-footer {
   margin-top: 4rem;
   border-top: 1px solid var(--line);
-  background: #0a0d12;
+  background: #ebe6dc;
   color: var(--ink);
 }
 
@@ -962,21 +964,21 @@ p {
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(20, 32, 51, 0.03);
   color: var(--ink);
-  border: 1.5px solid rgba(243, 245, 248, 0.16);
+  border: 1.5px solid rgba(20, 32, 51, 0.14);
 }
 
 .btn-secondary:hover {
-  background: rgba(201, 167, 106, 0.12);
-  color: #fff;
-  border-color: rgba(201, 167, 106, 0.35);
+  background: rgba(168, 132, 69, 0.12);
+  color: var(--ink);
+  border-color: rgba(168, 132, 69, 0.4);
 }
 
 .btn-ghost {
   background: transparent;
   color: var(--ink);
-  border: 1.5px solid rgba(243, 245, 248, 0.16);
+  border: 1.5px solid rgba(20, 32, 51, 0.14);
 }
 
 .btn-ghost:hover {
@@ -1022,7 +1024,7 @@ p {
 
 .site-footer {
   margin-top: 0;
-  background: linear-gradient(180deg, #12161e 0%, #0a0d12 100%);
+  background: linear-gradient(180deg, #f3eee4 0%, #ebe4d8 100%);
   border-top: 1px solid rgba(243, 245, 248, 0.08);
   color: var(--ink);
 }
@@ -1042,7 +1044,7 @@ p {
 .hero {
   min-height: min(88vh, 780px);
   align-items: center;
-  background: #0c0f14;
+  background: var(--surface);
 }
 
 .hero--photo {
@@ -1128,7 +1130,7 @@ p {
 }
 
 .people-section {
-  background: #10141c;
+  background: var(--mist);
 }
 
 .people-split {
@@ -1503,7 +1505,7 @@ p {
 }
 
 .trust-section {
-  background: #0f131a;
+  background: #f0ebe3;
 }
 
 .trust-logos {
@@ -1533,7 +1535,7 @@ p {
 }
 
 .testimonial-section {
-  background: linear-gradient(180deg, #10141c, #0c0f14);
+  background: linear-gradient(180deg, #f7f2ea, #efe8dc);
 }
 
 .testimonial-grid {
@@ -1609,7 +1611,7 @@ p {
 
 .final-cta-section {
   padding-top: 2rem;
-  background: linear-gradient(180deg, #10141c, #0a0d12);
+  background: linear-gradient(180deg, #f7f2ea, #ebe4d8);
 }
 
 .cta-band {
@@ -1618,7 +1620,7 @@ p {
   border-radius: 34px;
   background:
     radial-gradient(circle at 85% 18%, rgba(201, 167, 106, 0.28), transparent 28%),
-    linear-gradient(135deg, #1a2433, #121820);
+    linear-gradient(135deg, #ffffff, #f3eee6);
   border: 1px solid rgba(201, 167, 106, 0.28);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
 }
@@ -1745,9 +1747,9 @@ p {
     top: 74px;
     left: 0;
     right: 0;
-    background: rgba(12, 15, 20, 0.98);
-    border-bottom: 1px solid rgba(243, 245, 248, 0.1);
-    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.45);
+    background: rgba(251, 248, 242, 0.98);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 22px 50px rgba(20, 32, 51, 0.12);
     padding: 1rem 1.25rem 1.35rem;
     gap: 1rem;
     z-index: 60;
@@ -2127,7 +2129,7 @@ p {
 .assessment-section--atelier {
   background:
     linear-gradient(180deg, rgba(201, 167, 106, 0.04), transparent 30%),
-    linear-gradient(180deg, #12171f 0%, #0e1218 100%);
+    linear-gradient(180deg, #f8f4ec 0%, #efe8dc 100%);
 }
 
 .ability-grid--atelier {
@@ -2147,7 +2149,7 @@ p {
   padding: 1.65rem 1.5rem 1.75rem;
   border: 0;
   border-radius: 0;
-  background: #151a22;
+  background: var(--surface);
   box-shadow: none;
 }
 
@@ -2176,7 +2178,7 @@ p {
 }
 
 .testimonial-section--atelier {
-  background: #0c0f14;
+  background: var(--surface);
 }
 
 .testimonial-grid--atelier {
@@ -2199,7 +2201,7 @@ p {
   font-weight: 500;
   font-style: italic;
   line-height: 1.35;
-  color: #f3f5f8;
+  color: var(--ink);
 }
 
 .testimonial-card--atelier .testimonial-person strong {
@@ -2328,15 +2330,15 @@ p {
 .price-box,
 .step:not(.step--atelier),
 .testimonial-card:not(.testimonial-card--atelier) {
-  background: #151a22 !important;
+  background: var(--surface) !important;
   color: var(--ink);
-  border-color: rgba(243, 245, 248, 0.1) !important;
+  border-color: var(--line) !important;
 }
 
 .field input,
 .field select,
 .field textarea {
-  color: #f3f5f8 !important;
+  color: var(--ink) !important;
 }
 
 .option-btn.selected {
@@ -2348,7 +2350,7 @@ p {
 .section-title,
 .content-card h2,
 .faq-item summary {
-  color: #f3f5f8 !important;
+  color: var(--ink) !important;
 }
 
 .hero-title {
@@ -2382,7 +2384,7 @@ p {
   padding: 1.4rem;
   border: 1px solid rgba(243, 245, 248, 0.1);
   border-radius: 16px;
-  background: #151a22;
+  background: var(--surface);
 }
 
 .stat-compare__row {
@@ -2456,7 +2458,7 @@ p {
   padding: 1.25rem;
   border-radius: 14px;
   border: 1px solid rgba(243, 245, 248, 0.1);
-  background: #151a22;
+  background: var(--surface);
 }
 
 .difficulty-card__score {
@@ -2516,7 +2518,7 @@ p {
   padding: 1.5rem;
   border: 1px solid rgba(243, 245, 248, 0.1);
   border-radius: 16px;
-  background: #151a22;
+  background: var(--surface);
 }
 
 .report-actions__buttons {
@@ -2557,9 +2559,9 @@ p {
   gap: 0.4rem;
   padding: 0.85rem 0.55rem;
   border-radius: 12px;
-  border: 1px solid rgba(243, 245, 248, 0.1);
-  background: rgba(255, 255, 255, 0.03);
-  color: #f3f5f8;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
   font-size: 0.78rem;
   font-weight: 700;
   text-decoration: none;
@@ -2578,20 +2580,20 @@ p {
   height: 22px;
 }
 
-.share-icon-btn--x { color: #fff; }
-.share-icon-btn--facebook { color: #8ab4ff; }
-.share-icon-btn--messenger { color: #8ad7ff; }
-.share-icon-btn--linkedin { color: #7ec8ff; }
-.share-icon-btn--whatsapp { color: #86efac; }
-.share-icon-btn--telegram { color: #7dd3fc; }
-.share-icon-btn--reddit { color: #fdba74; }
-.share-icon-btn--threads { color: #e5e7eb; }
-.share-icon-btn--pinterest { color: #fca5a5; }
-.share-icon-btn--tumblr { color: #93c5fd; }
-.share-icon-btn--line { color: #86efac; }
-.share-icon-btn--vk { color: #93c5fd; }
-.share-icon-btn--email { color: #fde68a; }
-.share-icon-btn--copy { color: #e4c892; }
+.share-icon-btn--x { color: #142033; }
+.share-icon-btn--facebook { color: #1877f2; }
+.share-icon-btn--messenger { color: #0084ff; }
+.share-icon-btn--linkedin { color: #0a66c2; }
+.share-icon-btn--whatsapp { color: #128c7e; }
+.share-icon-btn--telegram { color: #229ed9; }
+.share-icon-btn--reddit { color: #ff4500; }
+.share-icon-btn--threads { color: #142033; }
+.share-icon-btn--pinterest { color: #e60023; }
+.share-icon-btn--tumblr { color: #36465d; }
+.share-icon-btn--line { color: #06c755; }
+.share-icon-btn--vk { color: #0077ff; }
+.share-icon-btn--email { color: #8d6b35; }
+.share-icon-btn--copy { color: #6f5228; }
 
 .share-status {
   min-height: 1.35rem;
@@ -2885,7 +2887,7 @@ p {
 
 /* Famous people / celebrity IQ grid */
 .celebs-section {
-  background: linear-gradient(180deg, #0e1218 0%, #12171f 48%, #0c0f14 100%);
+  background: linear-gradient(180deg, #f4efe6 0%, #ebe4d8 48%, #e4ddd0 100%);
 }
 
 .section-title--wide {
@@ -2902,7 +2904,7 @@ p {
   margin: 0;
   overflow: hidden;
   border-radius: 14px;
-  background: #151a22;
+  background: var(--surface);
   border: 1px solid rgba(243, 245, 248, 0.08);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
   transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
@@ -2917,7 +2919,7 @@ p {
 .celeb-card__media {
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  background: #1c2330;
+  background: #e8eef5;
 }
 
 .celeb-card__media img {
@@ -2941,7 +2943,7 @@ p {
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #f3f5f8;
+  color: var(--ink);
   margin: 0;
 }
 
