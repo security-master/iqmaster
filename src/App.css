@@ -1,0 +1,158 @@
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.app-header h1 {
+  font-size: 2.75rem;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.app-header p {
+  margin: 0.5rem 0 0;
+  opacity: 0.85;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  backdrop-filter: blur(6px);
+}
+
+.question-prompt {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.choices {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.choice:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.choice.selected {
+  background: rgba(99, 102, 241, 0.45);
+  border-color: #a5b4fc;
+}
+
+.choice input {
+  accent-color: #a5b4fc;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.75rem 1.75rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: #6366f1;
+  color: white;
+  transition: transform 0.1s ease, opacity 0.15s ease, background 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  background: #4f46e5;
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.result-score {
+  text-align: center;
+}
+
+.result-score .iq {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+  margin: 0.25rem 0;
+  color: #a5b4fc;
+}
+
+.result-detail {
+  border-left: 4px solid transparent;
+  padding-left: 0.85rem;
+  margin: 1rem 0;
+}
+
+.result-detail.correct {
+  border-color: #34d399;
+}
+
+.result-detail.incorrect {
+  border-color: #f87171;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  margin-left: 0.5rem;
+}
+
+.badge.correct {
+  background: rgba(52, 211, 153, 0.25);
+  color: #6ee7b7;
+}
+
+.badge.incorrect {
+  background: rgba(248, 113, 113, 0.25);
+  color: #fca5a5;
+}
+
+.explanation {
+  opacity: 0.85;
+  font-size: 0.95rem;
+  margin-top: 0.35rem;
+}
+
+.status {
+  text-align: center;
+  opacity: 0.85;
+}
+
+.error {
+  text-align: center;
+  color: #fca5a5;
+}
