@@ -94,8 +94,9 @@ export function Home() {
         <div className="container people-split">
           <figure className="people-figure">
             <img
+              className="img-faces"
               src={asset('/images/cta-people.jpg')}
-              alt="Professionals collaborating after cognitive assessments"
+              alt="Professionals collaborating in a bright workspace"
               width={1600}
               height={1067}
             />
@@ -155,8 +156,9 @@ export function Home() {
           </div>
           <figure className="people-figure">
             <img
+              className="img-faces"
               src={asset('/images/section-study.jpg')}
-              alt="Person focused on a cognitive assessment session"
+              alt="Advisor reviewing assessment results with a client"
               width={1600}
               height={1067}
             />
@@ -191,8 +193,9 @@ export function Home() {
         <div className="container people-split">
           <figure className="people-figure">
             <img
+              className="img-desk"
               src={asset('/images/section-coach.jpg')}
-              alt="Coach reviewing assessment results with a client"
+              alt="Focused preparation for a visual reasoning assessment"
               width={1600}
               height={1067}
             />
