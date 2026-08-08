@@ -27,17 +27,24 @@ const FAQS = [
 
 export function FAQ() {
   return (
-    <div className="container page-hero">
-      <p className="eyebrow">FAQ</p>
-      <h1>Answers before you start</h1>
-      <p>Everything we wish classic IQ sites put above the fold.</p>
-      <div className="faq-list" style={{ marginTop: '2rem' }}>
-        {FAQS.map((item) => (
-          <details className="faq-item" key={item.q}>
-            <summary>{item.q}</summary>
-            <p>{item.a}</p>
-          </details>
-        ))}
+    <div className="page-shell">
+      <section className="container page-hero page-hero-card">
+        <p className="eyebrow">IQMaster FAQ</p>
+        <h1>Answers before you start your IQ test</h1>
+        <p>
+          Clear details about the questions, timing, report unlock, certificate, and how to view
+          your results later.
+        </p>
+      </section>
+      <div className="container faq-wrap">
+        <div className="faq-list">
+          {FAQS.map((item) => (
+            <details className="faq-item" key={item.q}>
+              <summary>{item.q}</summary>
+              <p>{item.a}</p>
+            </details>
+          ))}
+        </div>
       </div>
     </div>
   )

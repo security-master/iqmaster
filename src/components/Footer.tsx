@@ -7,8 +7,8 @@ export function Footer() {
         <div>
           <div className="footer-brand">IQMaster</div>
           <p>
-            A culture-fair online IQ assessment with a clear report and printable certificate.
-            Built for curiosity — not clinical diagnosis.
+            A polished online IQ test with a clear score report, percentile context, and printable
+            certificate. Built for personal insight and education.
           </p>
         </div>
         <div className="footer-col">
@@ -29,12 +29,13 @@ export function Footer() {
           <h4>Trust</h4>
           <Link to="/pricing">Transparent Pricing</Link>
           <Link to="/contact">Contact</Link>
+          <Link to="/faq">Help Center</Link>
           <p style={{ marginTop: '0.8rem' }}>Report unlock: $19</p>
         </div>
       </div>
       <div className="container footer-bottom">
-        <span>© {new Date().getFullYear()} IQMaster. Entertainment & education use.</span>
-        <span>30 questions · ~20–40 minutes · Culture-fair matrices</span>
+        <span>© {new Date().getFullYear()} IQMaster. Entertainment and education use.</span>
+        <span>30 questions - 20-40 minutes - printable certificate</span>
       </div>
     </footer>
   )
