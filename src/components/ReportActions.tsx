@@ -5,6 +5,7 @@ import {
   type CertificateDetails,
 } from '../lib/report/certificate'
 import { downloadReportHtml, printReportPdf, type ReportDetails } from '../lib/report/pdf'
+import { useI18n } from '../i18n/I18nContext'
 import { ShareButtons } from './ShareButtons'
 
 export type ReportActionsProps = ReportDetails & {
@@ -12,6 +13,7 @@ export type ReportActionsProps = ReportDetails & {
 }
 
 export function ReportActions(props: ReportActionsProps) {
+  const { t } = useI18n()
   const report: ReportDetails = props
   const certificate: CertificateDetails = {
     name: props.name,
@@ -47,61 +49,46 @@ export function ReportActions(props: ReportActionsProps) {
   return (
     <section className="report-actions no-print" aria-labelledby="report-actions-title">
       <div>
-        <p className="eyebrow">Paid unlock deliverables</p>
-        <h2 id="report-actions-title">Your report &amp; certificate</h2>
-        <p>
-          Download the full personalized analysis, or take the premium certificate as its own PDF /
-          image — ready for WhatsApp and social.
-        </p>
+        <p className="eyebrow">{t('reportUi.eyebrow')}</p>
+        <h2 id="report-actions-title">{t('reportUi.title')}</h2>
+        <p>{t('reportUi.lead')}</p>
       </div>
 
       <div className="report-actions__group">
-        <h3 className="report-actions__label">Analysis report</h3>
+        <h3 className="report-actions__label">{t('reportUi.analysis')}</h3>
         <div className="report-actions__buttons">
-          <button
-            className="btn btn-secondary"
-            type="button"
-            aria-label="Open print-ready analysis report to save as PDF"
-            onClick={onPrintReport}
-          >
-            Download PDF report
+          <button className="btn btn-secondary" type="button" onClick={onPrintReport}>
+            {t('reportUi.pdfReport')}
           </button>
-          <button
-            className="btn btn-secondary"
-            type="button"
-            aria-label="Download analysis report as HTML"
-            onClick={onDownloadHtml}
-          >
-            Download HTML report
+          <button className="btn btn-secondary" type="button" onClick={onDownloadHtml}>
+            {t('reportUi.htmlReport')}
           </button>
         </div>
       </div>
 
       <div className="report-actions__group">
-        <h3 className="report-actions__label">Certificate (separate)</h3>
+        <h3 className="report-actions__label">{t('reportUi.certGroup')}</h3>
         <div className="report-actions__buttons">
           <button
             className="btn btn-primary"
             type="button"
             disabled={!canIssueCertificate}
-            aria-label="Open print-ready certificate to save as PDF"
             onClick={onPrintCertificate}
           >
-            Download certificate PDF
+            {t('reportUi.pdfCert')}
           </button>
           <button
             className="btn btn-secondary"
             type="button"
             disabled={!canIssueCertificate}
-            aria-label="Download certificate as PNG image"
             onClick={() => void onDownloadCertificatePng()}
           >
-            Download certificate image
+            {t('reportUi.pngCert')}
           </button>
         </div>
         {!canIssueCertificate && (
           <p className="muted" style={{ marginTop: '0.6rem' }}>
-            Answer at least one item before a certificate can be issued.
+            {t('reportUi.needAnswer')}
           </p>
         )}
       </div>

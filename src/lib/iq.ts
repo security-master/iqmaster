@@ -68,6 +68,7 @@ export interface ScoreOptions {
   answers?: Array<number | null>
   track?: TrackId
   countryCode?: string
+  lang?: 'en' | 'tr'
 }
 
 const BANDS: Array<{ min: number; label: string; summary: string }> = [
@@ -103,10 +104,19 @@ const BANDS: Array<{ min: number; label: string; summary: string }> = [
   },
 ]
 
-const DIFFICULTY_LABELS: Record<1 | 2 | 3, string> = {
-  1: 'Foundational',
-  2: 'Intermediate',
-  3: 'Advanced',
+const DIFFICULTY_LABELS: Record<'en' | 'tr', Record<1 | 2 | 3, string>> = {
+  en: { 1: 'Foundational', 2: 'Intermediate', 3: 'Advanced' },
+  tr: { 1: 'Temel', 2: 'Orta', 3: 'İleri' },
+}
+
+const BANDS_TR: Record<string, string> = {
+  'Very Superior': 'Çok üstün',
+  Superior: 'Üstün',
+  'High Average': 'Yüksek ortalama',
+  Average: 'Ortalama',
+  'Low Average': 'Düşük ortalama',
+  'Below Average': 'Ortalama altı',
+  Incomplete: 'Eksik',
 }
 
 function clamp(n: number, min: number, max: number) {
@@ -201,14 +211,18 @@ export function buildItemAnalysis(
   })
 }
 
-export function buildDifficultyBreakdown(items: ItemAnalysisRow[]): DifficultyBreakdown[] {
+export function buildDifficultyBreakdown(
+  items: ItemAnalysisRow[],
+  lang: 'en' | 'tr' = 'en',
+): DifficultyBreakdown[] {
+  const labels = DIFFICULTY_LABELS[lang]
   return ([1, 2, 3] as const).map((level) => {
     const subset = items.filter((i) => i.difficulty === level)
     const answered = subset.filter((i) => i.status !== 'skipped')
     const correct = answered.filter((i) => i.status === 'correct').length
     return {
       level,
-      label: DIFFICULTY_LABELS[level],
+      label: labels[level],
       correct,
       answered: answered.length,
       accuracy: answered.length ? Math.round((correct / answered.length) * 100) : 0,
@@ -221,21 +235,38 @@ function buildAbilityProfile(
   answered: number,
   questionTotal: number,
   breakdown: DifficultyBreakdown[],
+  lang: 'en' | 'tr' = 'en',
 ) {
-  const labels = [
-    ['Pattern recognition', 'Matrix rule detection across changing visual features.'],
-    ['Working attention', 'Sustained focus across item progression.'],
-    ['Processing consistency', 'Stability of responding under timed visual load.'],
-    ['Abstract reasoning', 'Multi-rule inference on advanced items without language dependence.'],
-    ['Visual discrimination', 'Fine discrimination of shape, spacing, and figure–ground relationships.'],
-    ['Adaptive problem solving', 'Ability to adjust strategy as item complexity increases.'],
-  ] as const
+  const labels =
+    lang === 'tr'
+      ? ([
+          ['Örüntü tanıma', 'Değişen görsel özellikler arasında matris kuralı tespiti.'],
+          ['Çalışma dikkati', 'Madde ilerlemesi boyunca sürdürülen odak.'],
+          ['İşlem tutarlılığı', 'Zamanlı görsel yük altında yanıt kararlılığı.'],
+          ['Soyut muhakeme', 'Dil bağımlılığı olmadan ileri maddelerde çok-kurallı çıkarım.'],
+          ['Görsel ayırt etme', 'Şekil, boşluk ve şekil–zemin ilişkilerinin ince ayırımı.'],
+          ['Uyarlanabilir problem çözme', 'Madde karmaşıklığı artarken stratejiyi ayarlama becerisi.'],
+        ] as const)
+      : ([
+          ['Pattern recognition', 'Matrix rule detection across changing visual features.'],
+          ['Working attention', 'Sustained focus across item progression.'],
+          ['Processing consistency', 'Stability of responding under timed visual load.'],
+          ['Abstract reasoning', 'Multi-rule inference on advanced items without language dependence.'],
+          [
+            'Visual discrimination',
+            'Fine discrimination of shape, spacing, and figure–ground relationships.',
+          ],
+          ['Adaptive problem solving', 'Ability to adjust strategy as item complexity increases.'],
+        ] as const)
 
   if (answered === 0) {
     return labels.map(([label]) => ({
       label,
       score: 0,
-      note: 'Insufficient answered items to estimate this ability.',
+      note:
+        lang === 'tr'
+          ? 'Bu yeteneği tahmin etmek için yeterli cevaplanan madde yok.'
+          : 'Insufficient answered items to estimate this ability.',
     }))
   }
 
@@ -262,24 +293,39 @@ function buildAbilityProfile(
   return labels.map(([label, note], i) => ({ label, score: scores[i]!, note }))
 }
 
-function buildCountryComparison(iq: number, countryCode?: string): CountryComparison | undefined {
+function buildCountryComparison(
+  iq: number,
+  countryCode?: string,
+  lang: 'en' | 'tr' = 'en',
+): CountryComparison | undefined {
   const country = getCountryByCode(countryCode)
   if (!country) return undefined
   const delta = iq - country.average
+  const name = lang === 'tr' ? country.nameTr : country.name
   const label =
-    delta >= 15
-      ? `Well above the ${country.name} national average`
-      : delta >= 5
-        ? `Above the ${country.name} national average`
-        : delta >= -4
-          ? `Near the ${country.name} national average`
-          : delta >= -14
-            ? `Below the ${country.name} national average`
-            : `Well below the ${country.name} national average`
+    lang === 'tr'
+      ? delta >= 15
+        ? `${name} ulusal ortalamasının oldukça üzerinde`
+        : delta >= 5
+          ? `${name} ulusal ortalamasının üzerinde`
+          : delta >= -4
+            ? `${name} ulusal ortalamasına yakın`
+            : delta >= -14
+              ? `${name} ulusal ortalamasının altında`
+              : `${name} ulusal ortalamasının oldukça altında`
+      : delta >= 15
+        ? `Well above the ${name} national average`
+        : delta >= 5
+          ? `Above the ${name} national average`
+          : delta >= -4
+            ? `Near the ${name} national average`
+            : delta >= -14
+              ? `Below the ${name} national average`
+              : `Well below the ${name} national average`
 
   return {
     countryCode: country.code,
-    countryName: country.name,
+    countryName: name,
     nationalAverage: country.average,
     userIq: iq,
     delta,
@@ -294,6 +340,7 @@ function buildPersonalizedInsights(
   items: ItemAnalysisRow[],
   integrity: ScoreIntegrity,
   country?: CountryComparison,
+  lang: 'en' | 'tr' = 'en',
 ): PersonalizedInsight[] {
   const insights: PersonalizedInsight[] = []
   const correct = items.filter((i) => i.status === 'correct').length
@@ -301,50 +348,67 @@ function buildPersonalizedInsights(
   const skipped = items.filter((i) => i.status === 'skipped').length
   const hard = breakdown.find((b) => b.level === 3)
   const easy = breakdown.find((b) => b.level === 1)
+  const tr = lang === 'tr'
 
   insights.push({
-    title: 'Your response signature',
-    text: `You answered ${correct} items correctly, missed ${incorrect}, and left ${skipped} unanswered. Your estimated IQ of ${iq} places you in the ${band} band for this culture-fair session.`,
+    title: tr ? 'Cevap imzanız' : 'Your response signature',
+    text: tr
+      ? `${correct} maddeyi doğru, ${incorrect} maddeyi yanlış cevapladınız; ${skipped} maddeyi boş bıraktınız. Tahmini IQ’nuz ${iq} ile bu kültürler arası oturumda ${band} bandındasınız.`
+      : `You answered ${correct} items correctly, missed ${incorrect}, and left ${skipped} unanswered. Your estimated IQ of ${iq} places you in the ${band} band for this culture-fair session.`,
   })
 
   if (easy && easy.answered > 0) {
     insights.push({
-      title: 'Foundational items',
+      title: tr ? 'Temel maddeler' : 'Foundational items',
       text:
         easy.accuracy >= 85
-          ? `Strong grip on foundational matrices (${easy.accuracy}% correct)—your basic visual rule detection is reliable.`
-          : `Foundational accuracy was ${easy.accuracy}%. Tightening early-item focus usually stabilizes the whole estimate.`,
+          ? tr
+            ? `Temel matrislerde güçlü tutuş (%${easy.accuracy} doğru)—temel görsel kural tespitiniz güvenilir.`
+            : `Strong grip on foundational matrices (${easy.accuracy}% correct)—your basic visual rule detection is reliable.`
+          : tr
+            ? `Temel doğruluk %${easy.accuracy}. Erken maddelere odaklanmayı sıkılaştırmak genelde tüm tahmini dengeler.`
+            : `Foundational accuracy was ${easy.accuracy}%. Tightening early-item focus usually stabilizes the whole estimate.`,
     })
   }
 
   if (hard && hard.answered > 0) {
     insights.push({
-      title: 'Advanced matrices',
+      title: tr ? 'İleri matrisler' : 'Advanced matrices',
       text:
         hard.accuracy >= 60
-          ? `You held ground on advanced multi-rule items (${hard.accuracy}% correct)—a hallmark of stronger abstract reasoning.`
-          : `Advanced items were the main challenge (${hard.accuracy}% correct). Extra time on late-stage patterns often lifts this slice most.`,
+          ? tr
+            ? `İleri çok-kurallı maddelerde yerinizi korudunuz (%${hard.accuracy} doğru)—daha güçlü soyut muhakemenin işareti.`
+            : `You held ground on advanced multi-rule items (${hard.accuracy}% correct)—a hallmark of stronger abstract reasoning.`
+          : tr
+            ? `İleri maddeler ana zorluk oldu (%${hard.accuracy} doğru). Geç aşama örüntülerine ekstra süre bu dilimi en çok yükseltir.`
+            : `Advanced items were the main challenge (${hard.accuracy}% correct). Extra time on late-stage patterns often lifts this slice most.`,
     })
   }
 
   if (country) {
     insights.push({
-      title: 'National context',
-      text: `Compared with ${country.countryName}'s reported average of ${country.nationalAverage}, your score is ${
-        country.delta >= 0 ? `+${country.delta}` : `${country.delta}`
-      } points (${country.label.toLowerCase()}).`,
+      title: tr ? 'Ulusal bağlam' : 'National context',
+      text: tr
+        ? `${country.countryName} bildirilen ortalaması ${country.nationalAverage} ile karşılaştırıldığında skorunuz ${
+            country.delta >= 0 ? `+${country.delta}` : `${country.delta}`
+          } puan (${country.label.toLowerCase()}).`
+        : `Compared with ${country.countryName}'s reported average of ${country.nationalAverage}, your score is ${
+            country.delta >= 0 ? `+${country.delta}` : `${country.delta}`
+          } points (${country.label.toLowerCase()}).`,
     })
   }
 
   if (integrity.flags.length) {
     insights.push({
-      title: 'Integrity notes',
+      title: tr ? 'Bütünlük notları' : 'Integrity notes',
       text: integrity.note,
     })
   } else {
     insights.push({
-      title: 'Session quality',
-      text: 'Response timing and choice patterns look consistent for an entertainment assessment—no integrity penalties were applied.',
+      title: tr ? 'Oturum kalitesi' : 'Session quality',
+      text: tr
+        ? 'Cevap zamanlaması ve seçim örüntüleri eğlence değerlendirmesi için tutarlı görünüyor—bütünlük cezası uygulanmadı.'
+        : 'Response timing and choice patterns look consistent for an entertainment assessment—no integrity penalties were applied.',
     })
   }
 
@@ -365,9 +429,10 @@ export function scoreAnswers(
   const coverage = questionTotal === 0 ? 0 : answered / questionTotal
   const confidence =
     answered < 8 ? 'low' : answered < questionTotal ? 'medium' : 'standard'
+  const lang = options.lang ?? 'en'
   const integrity = evaluateIntegrity(answered, questionTotal, options.elapsedSeconds, options.answers)
   const itemAnalysis = buildItemAnalysis(options.answers, options.track ?? 'adult')
-  const difficultyBreakdown = buildDifficultyBreakdown(itemAnalysis)
+  const difficultyBreakdown = buildDifficultyBreakdown(itemAnalysis, lang)
   const reliability =
     answered === 0
       ? 0
@@ -425,15 +490,17 @@ export function scoreAnswers(
                 : 'Building toward the global midpoint'
 
   const countryComparison =
-    answered === 0 ? undefined : buildCountryComparison(iq, options.countryCode)
-  const abilityProfile = buildAbilityProfile(accuracy, answered, questionTotal, difficultyBreakdown)
+    answered === 0 ? undefined : buildCountryComparison(iq, options.countryCode, lang)
+  const abilityProfile = buildAbilityProfile(accuracy, answered, questionTotal, difficultyBreakdown, lang)
+  const bandLabel = lang === 'tr' ? (BANDS_TR[band.label] ?? band.label) : band.label
   const personalizedInsights = buildPersonalizedInsights(
     iq,
-    band.label,
+    bandLabel,
     difficultyBreakdown,
     itemAnalysis,
     integrity,
     countryComparison,
+    lang,
   )
 
   return {
@@ -441,10 +508,14 @@ export function scoreAnswers(
     percentile,
     band:
       answered === 0
-        ? 'Incomplete'
+        ? lang === 'tr'
+          ? 'Eksik'
+          : 'Incomplete'
         : confidence === 'low'
-          ? `Provisional / Low confidence (${band.label})`
-          : band.label,
+          ? lang === 'tr'
+            ? `Geçici / Düşük güven (${bandLabel})`
+            : `Provisional / Low confidence (${bandLabel})`
+          : bandLabel,
     summary:
       answered === 0
         ? 'This session has no answered items, so IQMaster cannot issue a reliable score or certificate claim.'
@@ -472,41 +543,63 @@ export function scoreAnswers(
 /** Normalize older stored results; optionally rebuild analysis from live answers. */
 export function normalizeScoreResult(
   result: ScoreResult,
-  options?: { answers?: Array<number | null>; track?: TrackId; countryCode?: string },
+  options?: {
+    answers?: Array<number | null>
+    track?: TrackId
+    countryCode?: string
+    lang?: 'en' | 'tr'
+  },
 ): ScoreResult {
+  const lang = options?.lang ?? 'en'
   const itemAnalysis =
     result.itemAnalysis ??
     (options?.answers ? buildItemAnalysis(options.answers, options.track ?? 'adult') : undefined)
-  const difficultyBreakdown =
-    result.difficultyBreakdown ?? (itemAnalysis ? buildDifficultyBreakdown(itemAnalysis) : undefined)
-  const countryComparison =
-    result.countryComparison ?? buildCountryComparison(result.iq, options?.countryCode)
+  // Rebuild language-sensitive slices when answers are available or lang is TR.
+  const difficultyBreakdown = itemAnalysis
+    ? buildDifficultyBreakdown(itemAnalysis, lang)
+    : result.difficultyBreakdown
+  const countryComparison = buildCountryComparison(result.iq, options?.countryCode, lang) ??
+    (result.countryComparison
+      ? {
+          ...result.countryComparison,
+          countryName:
+            lang === 'tr'
+              ? (getCountryByCode(result.countryComparison.countryCode)?.nameTr ??
+                result.countryComparison.countryName)
+              : (getCountryByCode(result.countryComparison.countryCode)?.name ??
+                result.countryComparison.countryName),
+        }
+      : undefined)
   const integrity = result.integrity ?? {
     flags: [],
     speedPenalty: 0,
     patternPenalty: 0,
-    note: 'No integrity warnings recorded for this stored result.',
+    note:
+      lang === 'tr'
+        ? 'Bu kayıtlı sonuç için bütünlük uyarısı yok.'
+        : 'No integrity warnings recorded for this stored result.',
   }
-  const abilityProfile =
-    result.abilityProfile ??
-    buildAbilityProfile(
-      (result.accuracy ?? 0) / 100,
-      result.answered ?? 0,
-      result.questionTotal ?? result.answered ?? 0,
-      difficultyBreakdown ?? [],
-    )
+  const abilityProfile = itemAnalysis
+    ? buildAbilityProfile(
+        (result.accuracy ?? 0) / 100,
+        result.answered ?? 0,
+        result.questionTotal ?? result.answered ?? 0,
+        difficultyBreakdown ?? [],
+        lang,
+      )
+    : result.abilityProfile
   const personalizedInsights =
-    result.personalizedInsights ??
-    (itemAnalysis && difficultyBreakdown
+    itemAnalysis && difficultyBreakdown
       ? buildPersonalizedInsights(
           result.iq,
-          result.band,
+          cleanBandLabel(result.band),
           difficultyBreakdown,
           itemAnalysis,
           integrity,
           countryComparison,
+          lang,
         )
-      : undefined)
+      : result.personalizedInsights
 
   return {
     ...result,

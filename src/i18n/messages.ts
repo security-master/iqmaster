@@ -1,10 +1,30 @@
+import { pageMessages } from './pageMessages'
+
 type MessageTree = {
   [key: string]: string | MessageTree
 }
 
 export type { MessageTree }
 
-export const messages: Record<'en' | 'tr', MessageTree> = {
+function mergeTrees(base: MessageTree, extra: MessageTree): MessageTree {
+  const out: MessageTree = { ...base }
+  for (const [key, value] of Object.entries(extra)) {
+    const existing = out[key]
+    if (
+      value &&
+      typeof value === 'object' &&
+      existing &&
+      typeof existing === 'object'
+    ) {
+      out[key] = mergeTrees(existing as MessageTree, value as MessageTree)
+    } else {
+      out[key] = value
+    }
+  }
+  return out
+}
+
+const coreMessages: Record<'en' | 'tr', MessageTree> = {
   en: {
     nav: {
       progress: 'Progress',
@@ -558,4 +578,9 @@ export const messages: Record<'en' | 'tr', MessageTree> = {
       },
     },
   },
+}
+
+export const messages: Record<'en' | 'tr', MessageTree> = {
+  en: mergeTrees(coreMessages.en, pageMessages.en),
+  tr: mergeTrees(coreMessages.tr, pageMessages.tr),
 }

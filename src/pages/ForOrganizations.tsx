@@ -1,92 +1,60 @@
 import { Link } from 'react-router-dom'
 import { Seo } from '../components/Seo'
-
-const orgUseCases = [
-  {
-    title: 'Families',
-    text: 'Buy a small shared pack and unlock reports for parents, teens, and siblings from one balance.',
-  },
-  {
-    title: 'Teachers',
-    text: 'Run a classroom or enrichment cohort with prepaid credits and simple assignment workflows.',
-  },
-  {
-    title: 'Coaches',
-    text: 'Give clients a structured reasoning benchmark and unlock only the reports you need.',
-  },
-  {
-    title: 'Companies and HR',
-    text: 'Prepare bulk employee, candidate, and talent development workflows with an API-ready credit model.',
-  },
-]
-
-const roles = [
-  {
-    name: 'org_admin',
-    description: 'Buys packages, monitors balance, and manages organization settings.',
-  },
-  {
-    name: 'coach_teacher',
-    description: 'Assigns assessments and unlocks reports for members when credits are available.',
-  },
-  {
-    name: 'member',
-    description: 'Takes free attempts and receives unlocked reports through the organization.',
-  },
-]
+import { useI18n } from '../i18n/I18nContext'
 
 export function ForOrganizations() {
+  const { t } = useI18n()
+
+  const orgUseCases = [
+    { title: t('org.familyTitle'), text: t('org.familyText') },
+    { title: t('org.teacherTitle'), text: t('org.teacherText') },
+    { title: t('org.coachTitle'), text: t('org.coachText') },
+    { title: t('org.hrTitle'), text: t('org.hrText') },
+  ]
+
+  const roles = [
+    { name: 'org_admin', description: t('org.roleAdmin') },
+    { name: 'coach_teacher', description: t('org.roleCoach') },
+    { name: 'member', description: t('org.roleMember') },
+  ]
+
   return (
     <div className="container page-hero">
-      <Seo
-        title="For Organizations — IQMaster Assessment Credits"
-        description="Prepaid IQ test credits for families, classrooms, coaches, and HR teams. Free starts, shared balance, and report unlocks for groups."
-      />
-      <p className="eyebrow">For organizations</p>
-      <h1>Assessment credits for groups that test more than one person.</h1>
-      <p>
-        IQMaster can support families, classrooms, coaching cohorts, companies, and HR teams with a
-        prepaid credit balance instead of one checkout per report.
-      </p>
+      <Seo title={t('org.seoTitle')} description={t('org.seoDescription')} />
+      <p className="eyebrow">{t('org.eyebrow')}</p>
+      <h1>{t('org.title')}</h1>
+      <p>{t('org.lead')}</p>
 
       <div className="split" style={{ marginTop: '2.5rem' }}>
         <div className="price-box">
           <div className="muted" style={{ fontWeight: 700 }}>
-            Credit model
+            {t('org.model')}
           </div>
           <div className="price">1:1</div>
-          <p>One credit unlocks one completed assessment report.</p>
+          <p>{t('org.modelLead')}</p>
           <ul className="checklist">
-            <li>Free starts can remain free for members</li>
-            <li>Org report unlocks consume credits</li>
-            <li>Package purchases increase the shared balance</li>
-            <li>History is stored locally in this demo build</li>
+            <li>{t('org.m1')}</li>
+            <li>{t('org.m2')}</li>
+            <li>{t('org.m3')}</li>
+            <li>{t('org.m4')}</li>
           </ul>
           <Link to="/packages" className="btn btn-primary" style={{ marginTop: '1.5rem' }}>
-            Compare packages
+            {t('org.compare')}
           </Link>
         </div>
 
         <div className="prose">
-          <h2>API-ready, but not API-first yet</h2>
-          <p>
-            HR Pro includes an API access flag in the data model so later billing, provisioning, and
-            report unlock endpoints can be wired without changing the package catalog.
-          </p>
-          <h2>Designed around credits</h2>
-          <p>
-            Credits keep billing understandable for coaches and administrators: buy a pack, assign
-            attempts, and spend only when a completed assessment report is unlocked.
-          </p>
-          <div className="notice">
-            Roles are typed for now only: org_admin, coach_teacher, and member.
-          </div>
+          <h2>{t('org.apiTitle')}</h2>
+          <p>{t('org.apiText')}</p>
+          <h2>{t('org.creditTitle')}</h2>
+          <p>{t('org.creditText')}</p>
+          <div className="notice">{t('org.rolesNote')}</div>
         </div>
       </div>
 
       <section className="section" style={{ paddingBottom: 0 }}>
-        <p className="eyebrow">Audiences</p>
-        <h2 className="section-title">One ledger, several buying motions</h2>
+        <p className="eyebrow">{t('org.audiencesEyebrow')}</p>
+        <h2 className="section-title">{t('org.audiencesTitle')}</h2>
         <div className="ability-grid" style={{ marginTop: '2rem' }}>
           {orgUseCases.map((item) => (
             <article className="ability" key={item.title}>
@@ -98,8 +66,8 @@ export function ForOrganizations() {
       </section>
 
       <section className="section" style={{ paddingTop: '3rem' }}>
-        <p className="eyebrow">Roles</p>
-        <h2 className="section-title">Access model placeholder</h2>
+        <p className="eyebrow">{t('org.rolesEyebrow')}</p>
+        <h2 className="section-title">{t('org.rolesTitle')}</h2>
         <div className="steps" style={{ marginTop: '2rem' }}>
           {roles.map((role) => (
             <article className="step" key={role.name}>
@@ -110,11 +78,11 @@ export function ForOrganizations() {
         </div>
         <div className="cta-band">
           <div>
-            <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)' }}>Preview org controls</h2>
-            <p>Use the dashboard skeleton to view credits, simulate an unlock, and inspect history.</p>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)' }}>{t('org.previewTitle')}</h2>
+            <p>{t('org.previewLead')}</p>
           </div>
           <Link to="/dashboard/org" className="btn btn-ghost">
-            Open dashboard
+            {t('org.openDashboard')}
           </Link>
         </div>
       </section>

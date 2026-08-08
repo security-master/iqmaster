@@ -20,9 +20,9 @@ export function TestResults() {
     const code = encodePortableResult(session) ?? ''
     setPortableCode(code)
     void syncSessionRemote(session).then(({ synced }) => {
-      setSyncNote(synced ? 'Synced to cloud store.' : 'Saved locally (cloud sync optional).')
+      setSyncNote(synced ? t('resultsExtra.synced') : t('resultsExtra.localSave'))
     })
-  }, [session])
+  }, [session, t])
 
   if (!session) return <Navigate to="/iq-test" replace />
   if (!session.paid) return <Navigate to={`/iq-test/${testId}/payment`} replace />
@@ -35,6 +35,7 @@ export function TestResults() {
     answers: session.answers,
     track: session.track,
     countryCode: profile.countryCode,
+    lang,
   })
   const completionMode = session.completionMode ?? (result.answered >= result.questionTotal ? 'full' : 'early')
   const completionLabel =
@@ -99,13 +100,13 @@ export function TestResults() {
 
       {country && (
         <section className="section results-block">
-          <p className="eyebrow">National statistics</p>
-          <h2 className="section-title section-title--wide">Your score vs country averages</h2>
+          <p className="eyebrow">{t('resultsExtra.national')}</p>
+          <h2 className="section-title section-title--wide">{t('resultsExtra.vsCountry')}</h2>
           <p className="section-lead">{country.label}</p>
           <div className="stat-compare">
             <div className="stat-compare__row">
               <div className="stat-compare__meta">
-                <strong>Your IQ</strong>
+                <strong>{t('resultsExtra.yourIq')}</strong>
                 <span>{result.iq}</span>
               </div>
               <div className="stat-compare__bar">
@@ -114,7 +115,7 @@ export function TestResults() {
             </div>
             <div className="stat-compare__row">
               <div className="stat-compare__meta">
-                <strong>{country.countryName} average</strong>
+                <strong>{t('resultsExtra.average', { country: country.countryName })}</strong>
                 <span>{country.nationalAverage}</span>
               </div>
               <div className="stat-compare__bar">
@@ -123,7 +124,7 @@ export function TestResults() {
             </div>
             <div className="stat-compare__row">
               <div className="stat-compare__meta">
-                <strong>Global mean</strong>
+                <strong>{t('resultsExtra.globalMean')}</strong>
                 <span>100</span>
               </div>
               <div className="stat-compare__bar">
@@ -131,12 +132,12 @@ export function TestResults() {
               </div>
             </div>
             <p className="muted stat-compare__delta">
-              Difference vs {country.countryName}:{' '}
+              {t('resultsExtra.delta', { country: country.countryName })}{' '}
               <strong>
                 {country.delta >= 0 ? '+' : ''}
                 {country.delta}
               </strong>{' '}
-              IQ points
+              {t('resultsExtra.iqPoints')}
             </p>
           </div>
         </section>
@@ -144,8 +145,8 @@ export function TestResults() {
 
       {result.personalizedInsights && result.personalizedInsights.length > 0 && (
         <section className="section results-block">
-          <p className="eyebrow">Personalized evaluation</p>
-          <h2 className="section-title section-title--wide">Built from your answers</h2>
+          <p className="eyebrow">{t('resultsExtra.personalized')}</p>
+          <h2 className="section-title section-title--wide">{t('resultsExtra.fromAnswers')}</h2>
           <div className="insight-list">
             {result.personalizedInsights.map((insight) => (
               <article className="insight-card" key={insight.title}>
@@ -159,17 +160,15 @@ export function TestResults() {
 
       {result.difficultyBreakdown && (
         <section className="section results-block">
-          <p className="eyebrow">Difficulty breakdown</p>
-          <h2 className="section-title">Correct vs incorrect by level</h2>
+          <p className="eyebrow">{t('resultsExtra.difficulty')}</p>
+          <h2 className="section-title">{t('resultsExtra.byLevel')}</h2>
           <div className="difficulty-grid">
             {result.difficultyBreakdown.map((d) => (
               <article className="difficulty-card" key={d.level}>
-                <p className="eyebrow">Level {d.level}</p>
+                <p className="eyebrow">{t('resultsExtra.level', { n: d.level })}</p>
                 <h3>{d.label}</h3>
                 <p className="difficulty-card__score">{d.accuracy}%</p>
-                <p>
-                  {d.correct}/{d.answered} correct
-                </p>
+                <p>{t('resultsExtra.correctOf', { correct: d.correct, answered: d.answered })}</p>
                 <div className="stat-compare__bar">
                   <span style={{ width: `${d.accuracy}%` }} className="is-you" />
                 </div>
@@ -181,15 +180,15 @@ export function TestResults() {
 
       {result.itemAnalysis && (
         <section className="section results-block">
-          <p className="eyebrow">Answer review</p>
-          <h2 className="section-title section-title--wide">Every item mapped</h2>
-          <p className="section-lead">Green = correct · Red = incorrect · Grey = skipped</p>
+          <p className="eyebrow">{t('resultsExtra.answerReview')}</p>
+          <h2 className="section-title section-title--wide">{t('resultsExtra.everyItem')}</h2>
+          <p className="section-lead">{t('resultsExtra.legend')}</p>
           <div className="item-review">
             {result.itemAnalysis.map((item) => (
               <div
                 key={item.index}
                 className={`item-chip item-chip--${item.status}`}
-                title={`Item ${item.index + 1} · Difficulty ${item.difficulty} · ${item.status}`}
+                title={`${item.index + 1} · D${item.difficulty} · ${item.status}`}
               >
                 <span>{item.index + 1}</span>
                 <small>D{item.difficulty}</small>
@@ -200,7 +199,7 @@ export function TestResults() {
       )}
 
       <section className="section results-block">
-        <p className="eyebrow">Ability profile</p>
+        <p className="eyebrow">{t('resultsExtra.ability')}</p>
         <div className="ability-grid">
           {result.abilityProfile.map((item) => (
             <article className="ability assessment-card" key={item.label}>
@@ -215,10 +214,10 @@ export function TestResults() {
 
       {portableCode && (
         <div className="notice no-print" style={{ marginTop: '1rem' }}>
-          <strong>Recovery code</strong>
+          <strong>{t('resultsExtra.recovery')}</strong>
           <p style={{ marginTop: '0.45rem', wordBreak: 'break-all', fontSize: '0.9rem' }}>{portableCode}</p>
           <p className="muted" style={{ marginTop: '0.4rem' }}>
-            Paste this on Display Results to reopen on another device without Stripe/cloud.
+            {t('resultsExtra.recoveryHint')}
           </p>
         </div>
       )}
@@ -251,11 +250,9 @@ export function TestResults() {
       </div>
 
       <section className="section results-block certificate-section">
-        <p className="eyebrow">Premium certificate</p>
-        <h2 className="section-title section-title--wide">Print-ready, share-ready</h2>
-        <p className="section-lead">
-          Independent from the analysis report — download as PDF or image, or share on WhatsApp above.
-        </p>
+        <p className="eyebrow">{t('resultsExtra.premiumCert')}</p>
+        <h2 className="section-title section-title--wide">{t('resultsExtra.printReady')}</h2>
+        <p className="section-lead">{t('resultsExtra.certLead')}</p>
         <CertificateView
           name={profile.name}
           iq={result.iq}

@@ -34,7 +34,7 @@ export function TestComplete() {
       setError(t('test.complete.error'))
       return
     }
-    completeProfile(testId, { name, age, gender, countryCode })
+    completeProfile(testId, { name, age, gender, countryCode }, lang)
     navigate(`/iq-test/${testId}/payment`)
   }
 
