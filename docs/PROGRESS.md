@@ -2,46 +2,43 @@
 
 **Branch:** `cursor/iqmaster-platform-v1-472f`  
 **Orkestra:** ana ajan  
-**Son güncelleme:** 2026-08-08 12:10 UTC
+**Son güncelleme:** 2026-08-08 12:15 UTC
 
 ## Genel ilerleme
 
 | Metrik | Değer |
 |--------|-------|
-| **Toplam** | **48%** |
+| **Toplam** | **78%** |
 | Faz | v1 paralel uygulama |
-| Durum | D+E bitti · A/B/C sürüyor · F kısmi entegrasyon |
+| Durum | A sürüyor · B/C/D/E bitti · F entegrasyon |
 
 ```
-[█████████░░░░░░░░░░░] 48%
+[███████████████░░░░░] 78%
 ```
 
 ## İş akışları
 
-| ID | İş | Ajan ID | Dosya sahipliği | % | Durum |
-|----|-----|---------|-----------------|---|--------|
-| A | Tasarımı referansa yaklaştır | `bc-3748bdb0…` | styles, Header/Footer, Home/About/FAQ | 35% | in_progress |
-| B | Erken bitirme + görsel-only motor | `bc-b2cf550a…` | session/iq, Test*, questions.ts | 100% | done |
-| C | Yaş grupları + çocuk bankaları | `bc-42f69d55…` | test-catalog, kids/teens banks, AgeSelect | 40% | running (files appearing) |
-| D | B2B paket/kredi iskeleti | `bc-2f3779d6…` | packages, billing, OrgDashboard | 100% | done |
-| E | PDF + sosyal paylaşım | `bc-c74bb61b…` | report/*, ShareButtons, ReportActions | 100% | done |
-| F | Entegrasyon + build + push | orchestrator | App.tsx routing, çakışma çözümü | 35% | partial — D/E routes wired |
+| ID | İş | Ajan | % | Durum |
+|----|-----|------|---|--------|
+| A | Tasarımı referansa yaklaştır | design | 35% | in_progress (local WIP) |
+| B | Erken bitirme + görsel-only motor | engine | 100% | done |
+| C | Yaş grupları + çocuk bankaları | content | 100% | done · routes wiring |
+| D | B2B paket/kredi iskeleti | b2b | 100% | done · routed |
+| E | PDF + sosyal paylaşım | share | 100% | done · wired into Results |
+| F | Entegrasyon + build + push | orchestrator | 70% | integrating |
 
 ## v1 kabul kriterleri
 
 - [ ] Tasarım referansa daha yakın
-- [ ] İstediğin soruda bitir + güven notu
-- [ ] Sadece görsel sorular
-- [ ] Çocuk / yaş grupları
-- [ ] Paketler: Koç, Öğretmen, Aile, Şirket, İK
-- [ ] PDF rapor
-- [ ] Sosyal paylaşım
-- [ ] Build yeşil
-
-## Nasıl bakılır?
-
-Bu dosya: `docs/PROGRESS.md` — her ajan kendi satırını günceller; orkestra toplam % hesaplar.
+- [x] İstediğin soruda bitir + güven notu
+- [x] Sadece görsel sorular (adult bank)
+- [x] Çocuk / yaş grupları bankaları
+- [x] Paketler: Koç, Öğretmen, Aile, Şirket, İK
+- [x] PDF rapor + sosyal paylaşım UI
+- [ ] Build yeşil (A bitince final)
 
 ## Günlük notlar
 
-- 12:08 — 5 paralel ajan başlatıldı (A–E). Orkestra entegrasyonu ajanlar bitince.
+- E Results’a bağlandı (`ReportActions`)
+- C dosyaları commit + `/age-groups`, `/kids-intro` route
+- A tasarım dosyaları hâlâ ajan WIP

@@ -1,4 +1,5 @@
 import { Navigate, useParams } from 'react-router-dom'
+import { ReportActions } from '../components/ReportActions'
 import { ordinal } from '../lib/iq'
 import { formatElapsed, getSession } from '../lib/session'
 
@@ -58,6 +59,16 @@ export function TestResults() {
             Print certificate
           </button>
         </div>
+      </div>
+
+      <div className="no-print">
+        <ReportActions
+          name={profile.name}
+          iq={result.iq}
+          band={result.band}
+          percentile={result.percentile}
+          testId={testId}
+        />
       </div>
 
       <div className="certificate" style={{ marginTop: '2rem' }} id="certificate">
