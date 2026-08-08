@@ -1,0 +1,113 @@
+import { useEffect, useState } from 'react'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { CellSvg, MatrixSvg } from '../components/PuzzleSvg'
+import { QUESTIONS } from '../data/questions'
+import { formatElapsed, getSession, setAnswer, updateElapsed } from '../lib/session'
+
+export function TestQuestion() {
+  const { testId = '', number = '1' } = useParams()
+  const navigate = useNavigate()
+  const index = Number(number) - 1
+  const question = QUESTIONS[index]
+  const session = getSession(testId)
+  const [elapsed, setElapsed] = useState(session?.elapsedSeconds ?? 0)
+  const [selected, setSelected] = useState<number | null>(session?.answers[index] ?? null)
+
+  useEffect(() => {
+    setSelected(session?.answers[index] ?? null)
+  }, [index, session])
+
+  useEffect(() => {
+    if (!session) return
+    const timer = window.setInterval(() => {
+      setElapsed((prev) => {
+        const next = prev + 1
+        updateElapsed(testId, next)
+        if (next >= 60 * 60) {
+          navigate(`/iq-test/${testId}/complete`)
+        }
+        return next
+      })
+    }, 1000)
+    return () => window.clearInterval(timer)
+  }, [testId, session, navigate])
+
+  if (!session) return <Navigate to="/iq-test" replace />
+  if (!question || Number.isNaN(index) || index < 0 || index >= QUESTIONS.length) {
+    return <Navigate to={`/iq-test/${testId}/1`} replace />
+  }
+
+  function choose(option: number) {
+    setSelected(option)
+    setAnswer(testId, index, option)
+  }
+
+  const isLast = index === QUESTIONS.length - 1
+
+  return (
+    <div className="container test-shell">
+      <div className="test-topbar">
+        <div>
+          Your Test ID: <strong>{testId}</strong>
+        </div>
+        <div>
+          Question {index + 1}/{QUESTIONS.length}
+        </div>
+        <div aria-live="polite">{formatElapsed(elapsed)}</div>
+      </div>
+
+      <div className="test-panel">
+        <p className="eyebrow">Matrix item</p>
+        <h2 style={{ fontSize: '1.45rem', marginTop: '0.4rem' }}>{question.prompt}</h2>
+
+        <div className="puzzle-stage">
+          <MatrixSvg matrix={question.matrix} />
+        </div>
+
+        <div className="options-grid">
+          {question.options.map((option, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`option-btn ${selected === i ? 'selected' : ''}`}
+              onClick={() => choose(i)}
+              aria-pressed={selected === i}
+            >
+              <span className="option-label">{String.fromCharCode(65 + i)}</span>
+              <CellSvg cell={option} size={72} />
+            </button>
+          ))}
+        </div>
+
+        <div className="pager">
+          <button
+            type="button"
+            disabled={index === 0}
+            onClick={() => navigate(`/iq-test/${testId}/${index}`)}
+          >
+            ←
+          </button>
+          {QUESTIONS.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`${i === index ? 'current' : ''} ${session.answers[i] != null ? 'answered' : ''}`}
+              onClick={() => navigate(`/iq-test/${testId}/${i + 1}`)}
+            >
+              {i + 1}
+            </button>
+          ))}
+          {!isLast ? (
+            <button type="button" onClick={() => navigate(`/iq-test/${testId}/${index + 2}`)}>
+              →
+            </button>
+          ) : (
+            <Link to={`/iq-test/${testId}/complete`} className="btn btn-primary" style={{ marginLeft: '0.5rem' }}>
+              Finish
+            </Link>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
