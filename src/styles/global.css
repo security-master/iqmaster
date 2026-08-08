@@ -1605,7 +1605,7 @@ p {
 
 .final-cta-section {
   padding-top: 2rem;
-  background: linear-gradient(180deg, white, #f3f6f9);
+  background: linear-gradient(180deg, #10141c, #0a0d12);
 }
 
 .cta-band {
@@ -1613,9 +1613,10 @@ p {
   padding: clamp(2rem, 5vw, 4rem);
   border-radius: 34px;
   background:
-    radial-gradient(circle at 85% 18%, rgba(247, 183, 49, 0.32), transparent 28%),
-    linear-gradient(135deg, var(--primary), var(--primary-deep));
-  box-shadow: 0 30px 80px rgba(20, 24, 31, 0.24);
+    radial-gradient(circle at 85% 18%, rgba(201, 167, 106, 0.28), transparent 28%),
+    linear-gradient(135deg, #1a2433, #121820);
+  border: 1px solid rgba(201, 167, 106, 0.28);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
 }
 
 .cta-band .eyebrow {
